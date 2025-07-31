@@ -1,0 +1,24 @@
+{
+  "$schema": "https://nitro.margelo.com/nitro.schema.json",
+  "cxxNamespace": [
+    "bleprintandscan"
+  ],
+  "ios": {
+    "iosModuleName": "BlePrintAndScan"
+  },
+  "android": {
+    "androidNamespace": [
+      "bleprintandscan"
+    ],
+    "androidCxxLibName": "BlePrintAndScan"
+  },
+  "autolinking": {
+    "BlePrintAndScan": {
+      "swift": "HybridBlePrintAndScan",
+      "kotlin": "HybridBlePrintAndScan"
+    }
+  },
+  "ignorePaths": [
+    "**/node_modules"
+  ]
+}
