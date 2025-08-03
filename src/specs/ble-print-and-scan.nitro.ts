@@ -14,11 +14,16 @@ export interface BlePrintAndScan extends HybridObject<{ android: 'kotlin', ios: 
   startScanningForBluetoothDevices(onDeviceFound: (devices: Device[]) => void): Promise<void>
   suspendScanForBluetoothDevices(): Promise<void>
   connectToBluetoothDevice(deviceId: string): Promise<void>
-  disconnectFromBluetoothDevice(): Promise<void>
+  disconnectFromBluetoothDevice(deviceId: string): Promise<void>
+  
+  // Connection status and management
+  isDeviceConnected(deviceId: string): Promise<boolean>
+  getConnectedDevices(): Promise<Device[]>
+  disconnectAllDevices(): Promise<void>
   
   // Thermal printing functions
   generateBytecode(value: string, printerWidth: number, mtuSize: number): Promise<ArrayBuffer[]>
   generateBytecodeBase64(value: string, printerWidth: number, mtuSize: number): Promise<string[]>
-  sendToBluetoothThermalPrinter(value: string, printerWidth: number): Promise<void>
+  sendToBluetoothThermalPrinter(deviceId: string, value: string, printerWidth: number): Promise<void>
   sendToUsbThermalPrinter(value: string, printerWidth: number, chunkSize: number): Promise<void>
 }

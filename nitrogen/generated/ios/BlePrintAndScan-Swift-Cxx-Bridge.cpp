@@ -37,6 +37,14 @@ namespace margelo::nitro::bleprintandscan::bridge::swift {
     };
   }
   
+  // pragma MARK: std::function<void(bool /* result */)>
+  Func_void_bool create_Func_void_bool(void* _Nonnull swiftClosureWrapper) {
+    auto swiftClosure = BlePrintAndScan::Func_void_bool::fromUnsafe(swiftClosureWrapper);
+    return [swiftClosure = std::move(swiftClosure)](bool result) mutable -> void {
+      swiftClosure.call(result);
+    };
+  }
+  
   // pragma MARK: std::function<void(const std::vector<std::shared_ptr<ArrayBuffer>>& /* result */)>
   Func_void_std__vector_std__shared_ptr_ArrayBuffer__ create_Func_void_std__vector_std__shared_ptr_ArrayBuffer__(void* _Nonnull swiftClosureWrapper) {
     auto swiftClosure = BlePrintAndScan::Func_void_std__vector_std__shared_ptr_ArrayBuffer__::fromUnsafe(swiftClosureWrapper);

@@ -9,11 +9,16 @@ import CoreBluetooth
 import Foundation
 import NitroModules
 
+struct ConnectionInfo {
+    let peripheral: CBPeripheral
+    var writableCharacteristics: [CBCharacteristic] = []
+    var isConnected: Bool = false
+}
+
 class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
     private var centralManager: CBCentralManager!
     private var discoveredPeripherals: [CBPeripheral] = []
-    private var connectedPeripheral: CBPeripheral?
-    private var writableCharacteristics: [CBCharacteristic] = []
+    private var connections: [String: ConnectionInfo] = [:] // deviceId -> ConnectionInfo
     private var mtu: Int = 20
     private let knownWritableUUIDs = [
         CBUUID(string: "00002AF1-0000-1000-8000-00805F9B34FB")
@@ -23,8 +28,9 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     
     let serialQueue: DispatchQueue = DispatchQueue(label: "com.benqoder.bluetooth.serialQueue");
     
-    var onConnectSuccess: ((CBPeripheral) -> Void)?
-    var onConnectFailure: ((Error) -> Void)?
+    // Connection callbacks per device
+    private var connectCallbacks: [String: (Result<Bool, Error>) -> Void] = [:]
+    private var disconnectCallbacks: [String: (Result<Bool, Error>) -> Void] = [:]
     
     override init() {
         super.init()
@@ -68,69 +74,107 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     
     func connectToDevice(identifier: UUID) async throws -> Bool {
         return try await withCheckedThrowingContinuation { continuation in
+            let deviceId = identifier.uuidString
+            
+            // Check if already connected
+            if let connectionInfo = connections[deviceId], connectionInfo.isConnected {
+                continuation.resume(returning: true)
+                return
+            }
+            
             guard let peripheral = discoveredPeripherals.first(where: { $0.identifier == identifier }) else {
                 continuation.resume(throwing: NSError(domain: "BluetoothError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Could not find peripheral with identifier \(identifier)"]))
                 return
             }
             
-            if connectedPeripheral?.identifier == identifier {
-                continuation.resume(returning: true)
-                return
-            }
-            
             print("Connecting to \(peripheral.name ?? "Unknown")...")
 
-            self.onConnectSuccess = { (connectedPeripheral: CBPeripheral) in
-                if connectedPeripheral.identifier == identifier {
-                    continuation.resume(returning: true)
+            // Store callback for this specific device
+            connectCallbacks[deviceId] = { result in
+                switch result {
+                case .success(let success):
+                    continuation.resume(returning: success)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
                 }
-            }
-
-            self.onConnectFailure = { error in
-                continuation.resume(throwing: error)
             }
 
             centralManager.connect(peripheral, options: [CBConnectPeripheralOptionNotifyOnDisconnectionKey: true])
         }
     }
     
-    var onDisconnectSuccess: (() -> Void)?
-    var onDisconnectFailure: ((Error) -> Void)?
-    
-    func disconnect() async throws -> Bool {
+    func disconnect(deviceId: String) async throws -> Bool {
         return try await withCheckedThrowingContinuation { continuation in
-            guard let peripheral = connectedPeripheral else {
+            guard let connectionInfo = connections[deviceId] else {
                 continuation.resume(returning: true)
                 return
             }
             
-            self.onDisconnectSuccess = {
-                continuation.resume(returning: true)
+            // Store callback for this specific device
+            disconnectCallbacks[deviceId] = { result in
+                switch result {
+                case .success(let success):
+                    continuation.resume(returning: success)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
             }
             
-            self.onDisconnectFailure = { error in
-                continuation.resume(throwing: error)
-            }
-            
-            centralManager.cancelPeripheralConnection(peripheral)
+            centralManager.cancelPeripheralConnection(connectionInfo.peripheral)
         }
     }
     
-    func getAllowedMtu() -> Int {
-        guard let peripheral = connectedPeripheral else {
-            print("No connected device")
+    func disconnectAllDevices() async throws -> Bool {
+        var allSuccess = true
+        
+        for deviceId in Array(connections.keys) {
+            do {
+                let success = try await disconnect(deviceId: deviceId)
+                if !success {
+                    allSuccess = false
+                }
+            } catch {
+                allSuccess = false
+                print("Failed to disconnect device \(deviceId): \(error)")
+            }
+        }
+        
+        return allSuccess
+    }
+    
+    func getAllowedMtu(deviceId: String) -> Int {
+        guard let connectionInfo = connections[deviceId], connectionInfo.isConnected else {
+            print("No connected device with ID: \(deviceId)")
             return 20
         }
         
-        let mtu = peripheral.maximumWriteValueLength(for: .withResponse)
-        
+        let mtu = connectionInfo.peripheral.maximumWriteValueLength(for: .withResponse)
         return mtu
     }
     
-    private var currentChunkIndex = 0
-    private var dataChunks: [Data] = []
-    private var currentContinuation: CheckedContinuation<Bool, Error>?
-    private var isWriting = false
+    func isConnected(deviceId: String) -> Bool {
+        return connections[deviceId]?.isConnected ?? false
+    }
+    
+    func getConnectedDevices() -> [Device] {
+        return connections.compactMap { (deviceId, connectionInfo) in
+            guard connectionInfo.isConnected else { return nil }
+            return Device(
+                id: deviceId,
+                name: connectionInfo.peripheral.name ?? "Unknown Device"
+            )
+        }
+    }
+    
+    // Writing state per device
+    private var writingStates: [String: WritingState] = [:]
+    
+    struct WritingState {
+        var currentChunkIndex = 0
+        var dataChunks: [Data] = []
+        var currentContinuation: CheckedContinuation<Bool, Error>?
+        var isWriting = false
+    }
     
     private func chunks(from data: Data, chunkSize: Int) -> [Data] {
         var chunks: [Data] = []
@@ -143,67 +187,78 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         return chunks
     }
 
-    func printWithDevice(lines: [Data]) async throws -> Bool {
+    func printWithDevice(deviceId: String, lines: [Data]) async throws -> Bool {
         return try await withCheckedThrowingContinuation { continuation in
-            guard !isWriting else {
-                continuation.resume(throwing: NSError(domain: "BluetoothError", code: 2, userInfo: [NSLocalizedDescriptionKey: "Another write operation is in progress."]))
-                return
-            }
-            isWriting = true
-            currentChunkIndex = 0
-            
-            guard let peripheral = connectedPeripheral else {
-                continuation.resume(throwing: NSError(domain: "BluetoothError", code: 3, userInfo: [NSLocalizedDescriptionKey: "No active connection."]))
+            // Check if device is connected
+            guard let connectionInfo = connections[deviceId], connectionInfo.isConnected else {
+                continuation.resume(throwing: NSError(domain: "BluetoothError", code: 3, userInfo: [NSLocalizedDescriptionKey: "No active connection for device \(deviceId)."]))
                 return
             }
             
-            print("Writable characteristics: \(writableCharacteristics.count) found.")
+            // Check if already writing to this device
+            if writingStates[deviceId]?.isWriting == true {
+                continuation.resume(throwing: NSError(domain: "BluetoothError", code: 2, userInfo: [NSLocalizedDescriptionKey: "Another write operation is in progress for device \(deviceId)."]))
+                return
+            }
             
-            let matchingCharacteristics = writableCharacteristics.filter { characteristic in
+            // Initialize writing state for this device
+            writingStates[deviceId] = WritingState()
+            writingStates[deviceId]?.isWriting = true
+            writingStates[deviceId]?.currentChunkIndex = 0
+            
+            let peripheral = connectionInfo.peripheral
+            
+            print("Writable characteristics: \(connectionInfo.writableCharacteristics.count) found for device \(deviceId).")
+            
+            let matchingCharacteristics = connectionInfo.writableCharacteristics.filter { characteristic in
                 knownWritableUUIDs.contains(characteristic.uuid)
             }
 
             // Check if there are matching characteristics
             guard let characteristic = matchingCharacteristics.first else {
-                continuation.resume(throwing: NSError(domain: "BluetoothError", code: 4, userInfo: [NSLocalizedDescriptionKey: "No active connection or no writable characteristic found."]))
+                continuation.resume(throwing: NSError(domain: "BluetoothError", code: 4, userInfo: [NSLocalizedDescriptionKey: "No writable characteristic found for device \(deviceId)."]))
                 return
             }
 
             let maxWriteLength = peripheral.maximumWriteValueLength(for: .withResponse)
             
-            print("Printing with max write length \(maxWriteLength).")
-            dataChunks = lines
-            currentContinuation = continuation
+            print("Printing to device \(deviceId) with max write length \(maxWriteLength).")
+            writingStates[deviceId]?.dataChunks = lines
+            writingStates[deviceId]?.currentContinuation = continuation
 
             // Start writing the first chunk
-            writeNextChunk(peripheral: peripheral, characteristic: characteristic)
+            writeNextChunk(deviceId: deviceId, peripheral: peripheral, characteristic: characteristic)
         }
     }
 
-    private func writeNextChunk(peripheral: CBPeripheral, characteristic: CBCharacteristic) {
-        guard currentChunkIndex < dataChunks.count else {
+    private func writeNextChunk(deviceId: String, peripheral: CBPeripheral, characteristic: CBCharacteristic) {
+        guard let writingState = writingStates[deviceId] else { return }
+        
+        guard writingState.currentChunkIndex < writingState.dataChunks.count else {
             // All chunks written
-            print("All data successfully sent.")
-            currentContinuation?.resume(returning: true)
-            isWriting = false
-            dataChunks.removeAll()
-            currentContinuation = nil
+            print("All data successfully sent to device \(deviceId).")
+            writingStates[deviceId]?.currentContinuation?.resume(returning: true)
+            writingStates[deviceId]?.isWriting = false
+            writingStates[deviceId]?.dataChunks.removeAll()
+            writingStates[deviceId]?.currentContinuation = nil
             return
         }
 
-        let chunk = dataChunks[currentChunkIndex]
+        let chunk = writingState.dataChunks[writingState.currentChunkIndex]
         peripheral.writeValue(chunk, for: characteristic, type: .withResponse)
         // The `didWriteValueFor` callback will be triggered upon completion or error
     }
     
     func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
+        let deviceId = peripheral.identifier.uuidString
+        
         if let error = error {
-            print("Error while writing: \(error.localizedDescription)")
-            currentContinuation?.resume(throwing: error)
+            print("Error while writing to device \(deviceId): \(error.localizedDescription)")
+            writingStates[deviceId]?.currentContinuation?.resume(throwing: error)
         } else {
             // Move to next chunk
-            currentChunkIndex += 1
-            writeNextChunk(peripheral: peripheral, characteristic: characteristic)
+            writingStates[deviceId]?.currentChunkIndex += 1
+            writeNextChunk(deviceId: deviceId, peripheral: peripheral, characteristic: characteristic)
         }
     }
     
@@ -233,30 +288,43 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     }
     
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        let deviceId = peripheral.identifier.uuidString
         peripheral.delegate = self
-        servicesCheckStatus = [:];
+        
+        // Initialize connection info
+        connections[deviceId] = ConnectionInfo(peripheral: peripheral, writableCharacteristics: [], isConnected: true)
+        servicesCheckStatus = [:]
+        
         peripheral.discoverServices(nil)
     }
     
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
-        if(error != nil) {
-            onConnectFailure?(error!)
+        let deviceId = peripheral.identifier.uuidString
+        
+        if let error = error {
+            connectCallbacks[deviceId]?(.failure(error))
+            connectCallbacks.removeValue(forKey: deviceId)
         }
     }
     
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        let deviceId = peripheral.identifier.uuidString
+        
+        // Update connection state
+        connections[deviceId]?.isConnected = false
+        
         if let error = error {
-            onDisconnectFailure?(error)
+            disconnectCallbacks[deviceId]?(.failure(error))
             print("Error while disconnecting from peripheral \(peripheral.name ?? "Unknown"): \(error.localizedDescription)")
         } else {
-            onDisconnectSuccess!()
+            disconnectCallbacks[deviceId]?(.success(true))
             print("Successfully disconnected from peripheral \(peripheral.name ?? "Unknown")")
         }
         
-        // Reset the connectedPeripheral variable
-        if peripheral == connectedPeripheral {
-            connectedPeripheral = nil
-        }
+        // Clean up callbacks and connection info
+        disconnectCallbacks.removeValue(forKey: deviceId)
+        connections.removeValue(forKey: deviceId)
+        writingStates.removeValue(forKey: deviceId)
     }
     
     // MARK: - CBPeripheralDelegate
@@ -282,8 +350,11 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     }
     
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+        let deviceId = peripheral.identifier.uuidString
+        
         if let error = error {
-            onConnectFailure?(error)
+            connectCallbacks[deviceId]?(.failure(error))
+            connectCallbacks.removeValue(forKey: deviceId)
             return
         }
         
@@ -291,21 +362,21 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         
         for characteristic in characteristics {
             if characteristic.properties.contains(.write) {
-                writableCharacteristics.append(characteristic)
+                connections[deviceId]?.writableCharacteristics.append(characteristic)
             }
         }
         
         // Mark the service as "checked"
         servicesCheckStatus[service.uuid] = true
-        print(service.uuid )
-        print("Finished checking characteristics for service \(service.uuid).")
+        print("Finished checking characteristics for service \(service.uuid) on device \(deviceId).")
         
         // Check if all services have been checked
         if servicesCheckStatus.values.allSatisfy({ $0 }) {
-            print("All services checked (\(writableCharacteristics.count)). Successfully connected to peripheral \(peripheral.name ?? "Unknown").")
+            let writableCount = connections[deviceId]?.writableCharacteristics.count ?? 0
+            print("All services checked (\(writableCount) writable characteristics). Successfully connected to peripheral \(peripheral.name ?? "Unknown").")
             
-            connectedPeripheral = peripheral
-            onConnectSuccess?(peripheral)
+            connectCallbacks[deviceId]?(.success(true))
+            connectCallbacks.removeValue(forKey: deviceId)
         }
     }
 }

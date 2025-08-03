@@ -108,8 +108,32 @@ namespace margelo::nitro::bleprintandscan {
       auto __value = std::move(__result.value());
       return __value;
     }
-    inline std::shared_ptr<Promise<void>> disconnectFromBluetoothDevice() override {
-      auto __result = _swiftPart.disconnectFromBluetoothDevice();
+    inline std::shared_ptr<Promise<void>> disconnectFromBluetoothDevice(const std::string& deviceId) override {
+      auto __result = _swiftPart.disconnectFromBluetoothDevice(deviceId);
+      if (__result.hasError()) [[unlikely]] {
+        std::rethrow_exception(__result.error());
+      }
+      auto __value = std::move(__result.value());
+      return __value;
+    }
+    inline std::shared_ptr<Promise<bool>> isDeviceConnected(const std::string& deviceId) override {
+      auto __result = _swiftPart.isDeviceConnected(deviceId);
+      if (__result.hasError()) [[unlikely]] {
+        std::rethrow_exception(__result.error());
+      }
+      auto __value = std::move(__result.value());
+      return __value;
+    }
+    inline std::shared_ptr<Promise<std::vector<Device>>> getConnectedDevices() override {
+      auto __result = _swiftPart.getConnectedDevices();
+      if (__result.hasError()) [[unlikely]] {
+        std::rethrow_exception(__result.error());
+      }
+      auto __value = std::move(__result.value());
+      return __value;
+    }
+    inline std::shared_ptr<Promise<void>> disconnectAllDevices() override {
+      auto __result = _swiftPart.disconnectAllDevices();
       if (__result.hasError()) [[unlikely]] {
         std::rethrow_exception(__result.error());
       }
@@ -132,8 +156,8 @@ namespace margelo::nitro::bleprintandscan {
       auto __value = std::move(__result.value());
       return __value;
     }
-    inline std::shared_ptr<Promise<void>> sendToBluetoothThermalPrinter(const std::string& value, double printerWidth) override {
-      auto __result = _swiftPart.sendToBluetoothThermalPrinter(value, std::forward<decltype(printerWidth)>(printerWidth));
+    inline std::shared_ptr<Promise<void>> sendToBluetoothThermalPrinter(const std::string& deviceId, const std::string& value, double printerWidth) override {
+      auto __result = _swiftPart.sendToBluetoothThermalPrinter(deviceId, value, std::forward<decltype(printerWidth)>(printerWidth));
       if (__result.hasError()) [[unlikely]] {
         std::rethrow_exception(__result.error());
       }

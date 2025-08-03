@@ -20,6 +20,9 @@ namespace margelo::nitro::bleprintandscan {
       prototype.registerHybridMethod("suspendScanForBluetoothDevices", &HybridBlePrintAndScanSpec::suspendScanForBluetoothDevices);
       prototype.registerHybridMethod("connectToBluetoothDevice", &HybridBlePrintAndScanSpec::connectToBluetoothDevice);
       prototype.registerHybridMethod("disconnectFromBluetoothDevice", &HybridBlePrintAndScanSpec::disconnectFromBluetoothDevice);
+      prototype.registerHybridMethod("isDeviceConnected", &HybridBlePrintAndScanSpec::isDeviceConnected);
+      prototype.registerHybridMethod("getConnectedDevices", &HybridBlePrintAndScanSpec::getConnectedDevices);
+      prototype.registerHybridMethod("disconnectAllDevices", &HybridBlePrintAndScanSpec::disconnectAllDevices);
       prototype.registerHybridMethod("generateBytecode", &HybridBlePrintAndScanSpec::generateBytecode);
       prototype.registerHybridMethod("generateBytecodeBase64", &HybridBlePrintAndScanSpec::generateBytecodeBase64);
       prototype.registerHybridMethod("sendToBluetoothThermalPrinter", &HybridBlePrintAndScanSpec::sendToBluetoothThermalPrinter);

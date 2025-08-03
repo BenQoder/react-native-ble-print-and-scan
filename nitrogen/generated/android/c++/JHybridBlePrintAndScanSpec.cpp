@@ -7,22 +7,22 @@
 
 #include "JHybridBlePrintAndScanSpec.hpp"
 
-// Forward declaration of `ArrayBuffer` to properly resolve imports.
-namespace NitroModules { class ArrayBuffer; }
 // Forward declaration of `Device` to properly resolve imports.
 namespace margelo::nitro::bleprintandscan { struct Device; }
+// Forward declaration of `ArrayBuffer` to properly resolve imports.
+namespace NitroModules { class ArrayBuffer; }
 
 #include <NitroModules/Promise.hpp>
 #include <NitroModules/JPromise.hpp>
-#include <NitroModules/ArrayBuffer.hpp>
+#include "Device.hpp"
 #include <vector>
+#include "JDevice.hpp"
+#include <string>
+#include <NitroModules/ArrayBuffer.hpp>
 #include <NitroModules/JArrayBuffer.hpp>
 #include <NitroModules/JUnit.hpp>
-#include <string>
-#include "Device.hpp"
 #include <functional>
 #include "JFunc_void_std__vector_Device_.hpp"
-#include "JDevice.hpp"
 
 namespace margelo::nitro::bleprintandscan {
 
@@ -115,8 +115,64 @@ namespace margelo::nitro::bleprintandscan {
       return __promise;
     }();
   }
-  std::shared_ptr<Promise<void>> JHybridBlePrintAndScanSpec::disconnectFromBluetoothDevice() {
-    static const auto method = javaClassStatic()->getMethod<jni::local_ref<JPromise::javaobject>()>("disconnectFromBluetoothDevice");
+  std::shared_ptr<Promise<void>> JHybridBlePrintAndScanSpec::disconnectFromBluetoothDevice(const std::string& deviceId) {
+    static const auto method = javaClassStatic()->getMethod<jni::local_ref<JPromise::javaobject>(jni::alias_ref<jni::JString> /* deviceId */)>("disconnectFromBluetoothDevice");
+    auto __result = method(_javaPart, jni::make_jstring(deviceId));
+    return [&]() {
+      auto __promise = Promise<void>::create();
+      __result->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>& /* unit */) {
+        __promise->resolve();
+      });
+      __result->cthis()->addOnRejectedListener([=](const jni::alias_ref<jni::JThrowable>& __throwable) {
+        jni::JniException __jniError(__throwable);
+        __promise->reject(std::make_exception_ptr(__jniError));
+      });
+      return __promise;
+    }();
+  }
+  std::shared_ptr<Promise<bool>> JHybridBlePrintAndScanSpec::isDeviceConnected(const std::string& deviceId) {
+    static const auto method = javaClassStatic()->getMethod<jni::local_ref<JPromise::javaobject>(jni::alias_ref<jni::JString> /* deviceId */)>("isDeviceConnected");
+    auto __result = method(_javaPart, jni::make_jstring(deviceId));
+    return [&]() {
+      auto __promise = Promise<bool>::create();
+      __result->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>& __boxedResult) {
+        auto __result = jni::static_ref_cast<jni::JBoolean>(__boxedResult);
+        __promise->resolve(static_cast<bool>(__result->value()));
+      });
+      __result->cthis()->addOnRejectedListener([=](const jni::alias_ref<jni::JThrowable>& __throwable) {
+        jni::JniException __jniError(__throwable);
+        __promise->reject(std::make_exception_ptr(__jniError));
+      });
+      return __promise;
+    }();
+  }
+  std::shared_ptr<Promise<std::vector<Device>>> JHybridBlePrintAndScanSpec::getConnectedDevices() {
+    static const auto method = javaClassStatic()->getMethod<jni::local_ref<JPromise::javaobject>()>("getConnectedDevices");
+    auto __result = method(_javaPart);
+    return [&]() {
+      auto __promise = Promise<std::vector<Device>>::create();
+      __result->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>& __boxedResult) {
+        auto __result = jni::static_ref_cast<jni::JArrayClass<JDevice>>(__boxedResult);
+        __promise->resolve([&]() {
+          size_t __size = __result->size();
+          std::vector<Device> __vector;
+          __vector.reserve(__size);
+          for (size_t __i = 0; __i < __size; __i++) {
+            auto __element = __result->getElement(__i);
+            __vector.push_back(__element->toCpp());
+          }
+          return __vector;
+        }());
+      });
+      __result->cthis()->addOnRejectedListener([=](const jni::alias_ref<jni::JThrowable>& __throwable) {
+        jni::JniException __jniError(__throwable);
+        __promise->reject(std::make_exception_ptr(__jniError));
+      });
+      return __promise;
+    }();
+  }
+  std::shared_ptr<Promise<void>> JHybridBlePrintAndScanSpec::disconnectAllDevices() {
+    static const auto method = javaClassStatic()->getMethod<jni::local_ref<JPromise::javaobject>()>("disconnectAllDevices");
     auto __result = method(_javaPart);
     return [&]() {
       auto __promise = Promise<void>::create();
@@ -180,9 +236,9 @@ namespace margelo::nitro::bleprintandscan {
       return __promise;
     }();
   }
-  std::shared_ptr<Promise<void>> JHybridBlePrintAndScanSpec::sendToBluetoothThermalPrinter(const std::string& value, double printerWidth) {
-    static const auto method = javaClassStatic()->getMethod<jni::local_ref<JPromise::javaobject>(jni::alias_ref<jni::JString> /* value */, double /* printerWidth */)>("sendToBluetoothThermalPrinter");
-    auto __result = method(_javaPart, jni::make_jstring(value), printerWidth);
+  std::shared_ptr<Promise<void>> JHybridBlePrintAndScanSpec::sendToBluetoothThermalPrinter(const std::string& deviceId, const std::string& value, double printerWidth) {
+    static const auto method = javaClassStatic()->getMethod<jni::local_ref<JPromise::javaobject>(jni::alias_ref<jni::JString> /* deviceId */, jni::alias_ref<jni::JString> /* value */, double /* printerWidth */)>("sendToBluetoothThermalPrinter");
+    auto __result = method(_javaPart, jni::make_jstring(deviceId), jni::make_jstring(value), printerWidth);
     return [&]() {
       auto __promise = Promise<void>::create();
       __result->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>& /* unit */) {

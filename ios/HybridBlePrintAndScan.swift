@@ -90,13 +90,43 @@ class HybridBlePrintAndScan: HybridBlePrintAndScanSpec {
         }
     }
     
-    func disconnectFromBluetoothDevice() throws -> Promise<Void> {
+    func disconnectFromBluetoothDevice(deviceId: String) throws -> Promise<Void> {
         return Promise.async {
             guard let manager = self.bluetoothManager else {
                 throw NSError(domain: "BluetoothError", code: 2, userInfo: [NSLocalizedDescriptionKey: "BluetoothManager not initialized"])
             }
             
-            _ = try await manager.disconnect()
+            _ = try await manager.disconnect(deviceId: deviceId)
+        }
+    }
+    
+    func isDeviceConnected(deviceId: String) throws -> Promise<Bool> {
+        return Promise.async {
+            guard let manager = self.bluetoothManager else {
+                throw NSError(domain: "BluetoothError", code: 2, userInfo: [NSLocalizedDescriptionKey: "BluetoothManager not initialized"])
+            }
+            
+            return manager.isConnected(deviceId: deviceId)
+        }
+    }
+    
+    func getConnectedDevices() throws -> Promise<[Device]> {
+        return Promise.async {
+            guard let manager = self.bluetoothManager else {
+                throw NSError(domain: "BluetoothError", code: 2, userInfo: [NSLocalizedDescriptionKey: "BluetoothManager not initialized"])
+            }
+            
+            return manager.getConnectedDevices()
+        }
+    }
+    
+    func disconnectAllDevices() throws -> Promise<Void> {
+        return Promise.async {
+            guard let manager = self.bluetoothManager else {
+                throw NSError(domain: "BluetoothError", code: 2, userInfo: [NSLocalizedDescriptionKey: "BluetoothManager not initialized"])
+            }
+            
+            _ = try await manager.disconnectAllDevices()
         }
     }
     
@@ -124,7 +154,7 @@ class HybridBlePrintAndScan: HybridBlePrintAndScanSpec {
         }
     }
     
-    func sendToBluetoothThermalPrinter(value: String, printerWidth: Double) throws -> Promise<Void> {
+    func sendToBluetoothThermalPrinter(deviceId: String, value: String, printerWidth: Double) throws -> Promise<Void> {
         return Promise.async {
             guard let manager = self.bluetoothManager else {
                 throw NSError(domain: "BluetoothError", code: 2, userInfo: [NSLocalizedDescriptionKey: "BluetoothManager not initialized"])
@@ -134,7 +164,11 @@ class HybridBlePrintAndScan: HybridBlePrintAndScanSpec {
                 throw NSError(domain: "BluetoothError", code: 3, userInfo: [NSLocalizedDescriptionKey: "Bluetooth is not supported on this device"])
             }
             
-            let mtuSize = manager.getAllowedMtu()
+            guard manager.isConnected(deviceId: deviceId) else {
+                throw NSError(domain: "BluetoothError", code: 7, userInfo: [NSLocalizedDescriptionKey: "Device \(deviceId) is not connected"])
+            }
+            
+            let mtuSize = manager.getAllowedMtu(deviceId: deviceId)
             
             let bitmapData = self.prepareImageForThermalPrinter(
                 base64ImageString: value,
@@ -142,9 +176,9 @@ class HybridBlePrintAndScan: HybridBlePrintAndScanSpec {
                 mtuSize: mtuSize
             )
             
-            print("Printing With Length \(bitmapData.count) bytes and \(mtuSize)")
+            print("Printing to device \(deviceId) with length \(bitmapData.count) bytes and MTU \(mtuSize)")
             
-            _ = try await manager.printWithDevice(lines: bitmapData.map { Data($0) })
+            _ = try await manager.printWithDevice(deviceId: deviceId, lines: bitmapData.map { Data($0) })
         }
     }
     

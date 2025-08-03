@@ -61,10 +61,13 @@ namespace margelo::nitro::bleprintandscan {
       virtual std::shared_ptr<Promise<void>> startScanningForBluetoothDevices(const std::function<void(const std::vector<Device>& /* devices */)>& onDeviceFound) = 0;
       virtual std::shared_ptr<Promise<void>> suspendScanForBluetoothDevices() = 0;
       virtual std::shared_ptr<Promise<void>> connectToBluetoothDevice(const std::string& deviceId) = 0;
-      virtual std::shared_ptr<Promise<void>> disconnectFromBluetoothDevice() = 0;
+      virtual std::shared_ptr<Promise<void>> disconnectFromBluetoothDevice(const std::string& deviceId) = 0;
+      virtual std::shared_ptr<Promise<bool>> isDeviceConnected(const std::string& deviceId) = 0;
+      virtual std::shared_ptr<Promise<std::vector<Device>>> getConnectedDevices() = 0;
+      virtual std::shared_ptr<Promise<void>> disconnectAllDevices() = 0;
       virtual std::shared_ptr<Promise<std::vector<std::shared_ptr<ArrayBuffer>>>> generateBytecode(const std::string& value, double printerWidth, double mtuSize) = 0;
       virtual std::shared_ptr<Promise<std::vector<std::string>>> generateBytecodeBase64(const std::string& value, double printerWidth, double mtuSize) = 0;
-      virtual std::shared_ptr<Promise<void>> sendToBluetoothThermalPrinter(const std::string& value, double printerWidth) = 0;
+      virtual std::shared_ptr<Promise<void>> sendToBluetoothThermalPrinter(const std::string& deviceId, const std::string& value, double printerWidth) = 0;
       virtual std::shared_ptr<Promise<void>> sendToUsbThermalPrinter(const std::string& value, double printerWidth, double chunkSize) = 0;
 
     protected:

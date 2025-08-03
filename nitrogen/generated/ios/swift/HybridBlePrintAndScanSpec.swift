@@ -19,10 +19,13 @@ public protocol HybridBlePrintAndScanSpec_protocol: HybridObject {
   func startScanningForBluetoothDevices(onDeviceFound: @escaping (_ devices: [Device]) -> Void) throws -> Promise<Void>
   func suspendScanForBluetoothDevices() throws -> Promise<Void>
   func connectToBluetoothDevice(deviceId: String) throws -> Promise<Void>
-  func disconnectFromBluetoothDevice() throws -> Promise<Void>
+  func disconnectFromBluetoothDevice(deviceId: String) throws -> Promise<Void>
+  func isDeviceConnected(deviceId: String) throws -> Promise<Bool>
+  func getConnectedDevices() throws -> Promise<[Device]>
+  func disconnectAllDevices() throws -> Promise<Void>
   func generateBytecode(value: String, printerWidth: Double, mtuSize: Double) throws -> Promise<[ArrayBuffer]>
   func generateBytecodeBase64(value: String, printerWidth: Double, mtuSize: Double) throws -> Promise<[String]>
-  func sendToBluetoothThermalPrinter(value: String, printerWidth: Double) throws -> Promise<Void>
+  func sendToBluetoothThermalPrinter(deviceId: String, value: String, printerWidth: Double) throws -> Promise<Void>
   func sendToUsbThermalPrinter(value: String, printerWidth: Double, chunkSize: Double) throws -> Promise<Void>
 }
 

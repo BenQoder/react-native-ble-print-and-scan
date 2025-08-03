@@ -67,7 +67,19 @@ abstract class HybridBlePrintAndScanSpec: HybridObject() {
   
   @DoNotStrip
   @Keep
-  abstract fun disconnectFromBluetoothDevice(): Promise<Unit>
+  abstract fun disconnectFromBluetoothDevice(deviceId: String): Promise<Unit>
+  
+  @DoNotStrip
+  @Keep
+  abstract fun isDeviceConnected(deviceId: String): Promise<Boolean>
+  
+  @DoNotStrip
+  @Keep
+  abstract fun getConnectedDevices(): Promise<Array<Device>>
+  
+  @DoNotStrip
+  @Keep
+  abstract fun disconnectAllDevices(): Promise<Unit>
   
   @DoNotStrip
   @Keep
@@ -79,7 +91,7 @@ abstract class HybridBlePrintAndScanSpec: HybridObject() {
   
   @DoNotStrip
   @Keep
-  abstract fun sendToBluetoothThermalPrinter(value: String, printerWidth: Double): Promise<Unit>
+  abstract fun sendToBluetoothThermalPrinter(deviceId: String, value: String, printerWidth: Double): Promise<Unit>
   
   @DoNotStrip
   @Keep

@@ -26,16 +26,21 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
+data class ConnectionInfo(
+    val device: RxBleDevice,
+    var connection: RxBleConnection? = null,
+    var writeableUUIDs: List<UUID> = listOf(),
+    var isConnected: Boolean = false
+)
+
 class BluetoothManager(private val context: Context) {
     private val bluetoothAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
     private val devices = mutableMapOf<String, String>() // Stores device ID and name
     private var scanSubscription: Disposable? = null
     private val rxBleClient: RxBleClient = RxBleClient.create(context)
     private val compositeDisposable = CompositeDisposable()
-    private var writeAbleUUIDS: List<UUID> = listOf()
-    private var device: RxBleDevice? = null
-
-    private var connection:RxBleConnection?  = null;
+    private val connections = mutableMapOf<String, ConnectionInfo>() // deviceId -> ConnectionInfo
+    private val deviceDisposables = mutableMapOf<String, CompositeDisposable>() // Per-device disposables
 
     companion object {
         const val REQUEST_BLUETOOTH_PERMISSIONS = 1
@@ -147,61 +152,113 @@ class BluetoothManager(private val context: Context) {
     }
 
     suspend fun connectToDevice(deviceId: String): Boolean = suspendCoroutine { continuation ->
-        device = rxBleClient.getBleDevice(deviceId)
+        // Check if already connected
+        if (connections[deviceId]?.isConnected == true) {
+            continuation.resume(true)
+            return@suspendCoroutine
+        }
 
-        Log.d("BluetoothManager", "Device State: ${device?.connectionState}")
+        val device = rxBleClient.getBleDevice(deviceId)
+        Log.d("BluetoothManager", "Connecting to device: $deviceId, State: ${device.connectionState}")
 
-        val disposable = device?.establishConnection(false)?.subscribe(
+        // Initialize disposable container for this device
+        if (!deviceDisposables.containsKey(deviceId)) {
+            deviceDisposables[deviceId] = CompositeDisposable()
+        }
+
+        val disposable = device.establishConnection(false).subscribe(
             { rxBleConnection ->
-                discoverServices(rxBleConnection)
+                Log.d("BluetoothManager", "Connected to device: $deviceId")
+                val connectionInfo = ConnectionInfo(device = device, connection = rxBleConnection, isConnected = true)
+                connections[deviceId] = connectionInfo
+                
+                discoverServices(deviceId, rxBleConnection)
                 continuation.resume(true)
             },
             { throwable ->
-                Log.e("BluetoothManager", "Connection error: ${throwable.message}")
+                Log.e("BluetoothManager", "Connection error for device $deviceId: ${throwable.message}")
                 continuation.resumeWithException(
-                    Exception("Error while connecting to device: ${throwable.message}", throwable)
+                    Exception("Error while connecting to device $deviceId: ${throwable.message}", throwable)
                 )
             }
         )
 
-        if (disposable != null) compositeDisposable.add(disposable)
+        deviceDisposables[deviceId]?.add(disposable)
     }
 
-    suspend fun disconnect(): Boolean = suspendCoroutine { continuation ->
-        if (connection == null) {
-            Log.d("BluetoothManager", "No active connection to disconnect.")
-            continuation.resume(false)
+    suspend fun disconnect(deviceId: String): Boolean = suspendCoroutine { continuation ->
+        val connectionInfo = connections[deviceId]
+        if (connectionInfo == null || !connectionInfo.isConnected) {
+            Log.d("BluetoothManager", "No active connection to disconnect for device: $deviceId")
+            continuation.resume(true)
             return@suspendCoroutine
         }
 
         try {
-            // Dispose of the active connection to disconnect
-            compositeDisposable.clear()
-            connection = null
-            device = null
-            Log.d("BluetoothManager", "Disconnected successfully.")
+            // Dispose of the device-specific disposables
+            deviceDisposables[deviceId]?.clear()
+            deviceDisposables.remove(deviceId)
+            
+            // Update connection state
+            connections[deviceId]?.isConnected = false
+            connections.remove(deviceId)
+            
+            Log.d("BluetoothManager", "Disconnected successfully from device: $deviceId")
             continuation.resume(true)
         } catch (e: Exception) {
-            Log.e("BluetoothManager", "Error while disconnecting: ${e.message}")
+            Log.e("BluetoothManager", "Error while disconnecting from device $deviceId: ${e.message}")
             continuation.resumeWithException(
-                Exception("Error while disconnecting: ${e.message}", e)
+                Exception("Error while disconnecting from device $deviceId: ${e.message}", e)
             )
         }
     }
 
-    fun getAllowedMtu(): Int {
-        return connection?.mtu ?: 20
+    suspend fun disconnectAllDevices(): Boolean {
+        var allSuccess = true
+        val deviceIds = connections.keys.toList()
+        
+        for (deviceId in deviceIds) {
+            try {
+                val success = disconnect(deviceId)
+                if (!success) {
+                    allSuccess = false
+                }
+            } catch (e: Exception) {
+                allSuccess = false
+                Log.e("BluetoothManager", "Failed to disconnect device $deviceId: ${e.message}")
+            }
+        }
+        
+        return allSuccess
     }
 
-    suspend fun printWithDevice(lines: List<ByteArray>): Boolean = suspendCoroutine { continuation ->
-        if (connection == null) {
+    fun getAllowedMtu(deviceId: String): Int {
+        return connections[deviceId]?.connection?.mtu ?: 20
+    }
+    
+    fun isConnected(deviceId: String): Boolean {
+        return connections[deviceId]?.isConnected ?: false
+    }
+    
+    fun getConnectedDevices(): List<Map<String, String>> {
+        return connections.filter { it.value.isConnected }.map { (deviceId, connectionInfo) ->
+            mapOf(
+                "id" to deviceId,
+                "name" to (devices[deviceId] ?: "Unknown Device")
+            )
+        }
+    }
+
+    suspend fun printWithDevice(deviceId: String, lines: List<ByteArray>): Boolean = suspendCoroutine { continuation ->
+        val connectionInfo = connections[deviceId]
+        if (connectionInfo == null || !connectionInfo.isConnected || connectionInfo.connection == null) {
             continuation.resumeWithException(
-                Exception("No active connection to print with.")
+                Exception("No active connection to print with for device: $deviceId")
             )
             return@suspendCoroutine
         }
 
-        Log.d("BluetoothManager", "Device State: ${device?.connectionState}")
+        Log.d("BluetoothManager", "Printing to device: $deviceId, State: ${connectionInfo.device.connectionState}")
 
         val totalSize = lines.sumOf { it.size }
         val byteArray = ByteArray(totalSize)
@@ -211,54 +268,56 @@ class BluetoothManager(private val context: Context) {
             offset += line.size
         }
 
-        val disposable = connection!!.createNewLongWriteBuilder()
+        val disposable = connectionInfo.connection!!.createNewLongWriteBuilder()
             .setCharacteristicUuid(knownWritableUUIDs.first())
             .setBytes(byteArray)
             .setMaxBatchSize(50)
             .build()
             .subscribe(
                 {
-                    Log.d("BluetoothManager", "Data successfully sent.")
+                    Log.d("BluetoothManager", "Data successfully sent to device: $deviceId")
                     continuation.resume(true)
                 },
                 { throwable ->
-                    Log.e("BluetoothManager", "Error while printing: ${throwable.message}")
+                    Log.e("BluetoothManager", "Error while printing to device $deviceId: ${throwable.message}")
                     continuation.resumeWithException(
-                        Exception("Error while printing: ${throwable.message}", throwable)
+                        Exception("Error while printing to device $deviceId: ${throwable.message}", throwable)
                     )
                 }
             )
 
-        compositeDisposable.add(disposable)
+        deviceDisposables[deviceId]?.add(disposable)
     }
 
-    private fun discoverServices(rxBleConnection: RxBleConnection) {
+    private fun discoverServices(deviceId: String, rxBleConnection: RxBleConnection) {
         val mtuRequestDisposable = rxBleConnection.requestMtu(512)
             .subscribe({
                 val disposable = rxBleConnection.discoverServices()
                     .subscribe(
                         { services ->
+                            val writeableUUIDs = mutableListOf<UUID>()
                             services.bluetoothGattServices.forEach { service ->
                                 service.characteristics.forEach { characteristic ->
                                     if (isCharacteristicWritable(characteristic)) {
-                                        writeAbleUUIDS = writeAbleUUIDS + characteristic.uuid
+                                        writeableUUIDs.add(characteristic.uuid)
                                     }
                                 }
                             }
+                            
+                            // Update connection info with discovered characteristics
+                            connections[deviceId]?.writeableUUIDs = writeableUUIDs
+                            Log.d("BluetoothManager", "Service discovery completed for device $deviceId. Found ${writeableUUIDs.size} writable characteristics.")
                         },
                         { throwable ->
-                            Log.e("BluetoothManager", "Service discovery failed: ${throwable.message}")
+                            Log.e("BluetoothManager", "Service discovery failed for device $deviceId: ${throwable.message}")
                         }
                     )
-                compositeDisposable.add(disposable)
+                deviceDisposables[deviceId]?.add(disposable)
             }, { throwable ->
-                Log.e("BluetoothManager", "Error while setting MTU: ${throwable.message}")
+                Log.e("BluetoothManager", "Error while setting MTU for device $deviceId: ${throwable.message}")
             })
 
-        compositeDisposable.add(mtuRequestDisposable)
-
-        connection = rxBleConnection;
-
+        deviceDisposables[deviceId]?.add(mtuRequestDisposable)
     }
 
     private fun isCharacteristicWritable(characteristic: BluetoothGattCharacteristic): Boolean {

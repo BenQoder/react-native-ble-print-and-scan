@@ -76,6 +76,40 @@ export default function TabTwoScreen() {
           <ThemedText type="link">Learn more</ThemedText>
         </ExternalLink>
       </Collapsible>
+      <Collapsible title="Multi-Device Bluetooth Printing">
+        <ThemedText>
+          This package now supports connecting to multiple Bluetooth printers simultaneously! 
+          Here's how to use the new multi-device API:
+        </ThemedText>
+        <ThemedText style={styles.codeBlock}>
+          {`// Connect to multiple devices
+await BlePrintAndScan.connectToBluetoothDevice("printer1-id")
+await BlePrintAndScan.connectToBluetoothDevice("printer2-id")
+
+// Print to specific devices
+await BlePrintAndScan.sendToBluetoothThermalPrinter(
+  "printer1-id", receiptData, 384
+)
+await BlePrintAndScan.sendToBluetoothThermalPrinter(
+  "printer2-id", labelData, 576
+)
+
+// Check connection status
+const isConnected = await BlePrintAndScan.isDeviceConnected("printer1-id")
+const connectedDevices = await BlePrintAndScan.getConnectedDevices()
+
+// Disconnect specific or all devices
+await BlePrintAndScan.disconnectFromBluetoothDevice("printer1-id")
+await BlePrintAndScan.disconnectAllDevices()`}
+        </ThemedText>
+        <ThemedText>
+          Key features:
+          {'\n'}• Connect to multiple printers simultaneously
+          {'\n'}• Device-specific printing operations
+          {'\n'}• Better resource management and error isolation
+          {'\n'}• Concurrent printing to different devices
+        </ThemedText>
+      </Collapsible>
       <Collapsible title="Animations">
         <ThemedText>
           This template includes an example of an animated component. The{' '}
@@ -106,5 +140,13 @@ const styles = StyleSheet.create({
   titleContainer: {
     flexDirection: 'row',
     gap: 8,
+  },
+  codeBlock: {
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    fontSize: 12,
+    backgroundColor: '#f5f5f5',
+    padding: 10,
+    borderRadius: 5,
+    marginVertical: 10,
   },
 });

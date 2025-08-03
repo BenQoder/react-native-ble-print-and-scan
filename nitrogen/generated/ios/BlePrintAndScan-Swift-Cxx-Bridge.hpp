@@ -130,6 +130,52 @@ namespace margelo::nitro::bleprintandscan::bridge::swift {
     return Func_void_std__vector_Device__Wrapper(std::move(value));
   }
   
+  // pragma MARK: std::shared_ptr<Promise<bool>>
+  /**
+   * Specialized version of `std::shared_ptr<Promise<bool>>`.
+   */
+  using std__shared_ptr_Promise_bool__ = std::shared_ptr<Promise<bool>>;
+  inline std::shared_ptr<Promise<bool>> create_std__shared_ptr_Promise_bool__() {
+    return Promise<bool>::create();
+  }
+  inline PromiseHolder<bool> wrap_std__shared_ptr_Promise_bool__(std::shared_ptr<Promise<bool>> promise) {
+    return PromiseHolder<bool>(std::move(promise));
+  }
+  
+  // pragma MARK: std::function<void(bool /* result */)>
+  /**
+   * Specialized version of `std::function<void(bool)>`.
+   */
+  using Func_void_bool = std::function<void(bool /* result */)>;
+  /**
+   * Wrapper class for a `std::function<void(bool / * result * /)>`, this can be used from Swift.
+   */
+  class Func_void_bool_Wrapper final {
+  public:
+    explicit Func_void_bool_Wrapper(std::function<void(bool /* result */)>&& func): _function(std::make_unique<std::function<void(bool /* result */)>>(std::move(func))) {}
+    inline void call(bool result) const {
+      _function->operator()(result);
+    }
+  private:
+    std::unique_ptr<std::function<void(bool /* result */)>> _function;
+  } SWIFT_NONCOPYABLE;
+  Func_void_bool create_Func_void_bool(void* _Nonnull swiftClosureWrapper);
+  inline Func_void_bool_Wrapper wrap_Func_void_bool(Func_void_bool value) {
+    return Func_void_bool_Wrapper(std::move(value));
+  }
+  
+  // pragma MARK: std::shared_ptr<Promise<std::vector<Device>>>
+  /**
+   * Specialized version of `std::shared_ptr<Promise<std::vector<Device>>>`.
+   */
+  using std__shared_ptr_Promise_std__vector_Device___ = std::shared_ptr<Promise<std::vector<Device>>>;
+  inline std::shared_ptr<Promise<std::vector<Device>>> create_std__shared_ptr_Promise_std__vector_Device___() {
+    return Promise<std::vector<Device>>::create();
+  }
+  inline PromiseHolder<std::vector<Device>> wrap_std__shared_ptr_Promise_std__vector_Device___(std::shared_ptr<Promise<std::vector<Device>>> promise) {
+    return PromiseHolder<std::vector<Device>>(std::move(promise));
+  }
+  
   // pragma MARK: std::vector<std::shared_ptr<ArrayBuffer>>
   /**
    * Specialized version of `std::vector<std::shared_ptr<ArrayBuffer>>`.
@@ -248,6 +294,24 @@ namespace margelo::nitro::bleprintandscan::bridge::swift {
   }
   inline Result_std__shared_ptr_Promise_void___ create_Result_std__shared_ptr_Promise_void___(const std::exception_ptr& error) {
     return Result<std::shared_ptr<Promise<void>>>::withError(error);
+  }
+  
+  // pragma MARK: Result<std::shared_ptr<Promise<bool>>>
+  using Result_std__shared_ptr_Promise_bool___ = Result<std::shared_ptr<Promise<bool>>>;
+  inline Result_std__shared_ptr_Promise_bool___ create_Result_std__shared_ptr_Promise_bool___(const std::shared_ptr<Promise<bool>>& value) {
+    return Result<std::shared_ptr<Promise<bool>>>::withValue(value);
+  }
+  inline Result_std__shared_ptr_Promise_bool___ create_Result_std__shared_ptr_Promise_bool___(const std::exception_ptr& error) {
+    return Result<std::shared_ptr<Promise<bool>>>::withError(error);
+  }
+  
+  // pragma MARK: Result<std::shared_ptr<Promise<std::vector<Device>>>>
+  using Result_std__shared_ptr_Promise_std__vector_Device____ = Result<std::shared_ptr<Promise<std::vector<Device>>>>;
+  inline Result_std__shared_ptr_Promise_std__vector_Device____ create_Result_std__shared_ptr_Promise_std__vector_Device____(const std::shared_ptr<Promise<std::vector<Device>>>& value) {
+    return Result<std::shared_ptr<Promise<std::vector<Device>>>>::withValue(value);
+  }
+  inline Result_std__shared_ptr_Promise_std__vector_Device____ create_Result_std__shared_ptr_Promise_std__vector_Device____(const std::exception_ptr& error) {
+    return Result<std::shared_ptr<Promise<std::vector<Device>>>>::withError(error);
   }
   
   // pragma MARK: Result<std::shared_ptr<Promise<std::vector<std::shared_ptr<ArrayBuffer>>>>>

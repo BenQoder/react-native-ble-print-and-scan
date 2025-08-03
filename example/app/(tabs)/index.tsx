@@ -7,7 +7,8 @@ import RecieptDOM from '@/components/RecieptDOM';
 export default function HomeScreen() {
   const [devices, setDevices] = useState<Device[]>([]);
   const [isScanning, setIsScanning] = useState(false);
-  const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
+  const [connectedDevices, setConnectedDevices] = useState<Device[]>([]);
+  const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [cachedScreenshot, setCachedScreenshot] = useState<string | null>(null);
@@ -63,26 +64,50 @@ export default function HomeScreen() {
   const connectToDevice = async (device: Device) => {
     try {
       await BlePrintAndScan.connectToBluetoothDevice(device.id);
-      setConnectedDevice(device);
+      
+      // Update connected devices list
+      const updatedConnectedDevices = await BlePrintAndScan.getConnectedDevices();
+      setConnectedDevices(updatedConnectedDevices);
+      
       Alert.alert('Success', `Connected to ${device.name}`);
     } catch (error) {
       Alert.alert('Error', `Failed to connect to ${device.name}: ${error}`);
     }
   };
 
-  const disconnectDevice = async () => {
+  const disconnectDevice = async (device: Device) => {
     try {
-      await BlePrintAndScan.disconnectFromBluetoothDevice();
-      setConnectedDevice(null);
-      Alert.alert('Success', 'Disconnected from device');
+      await BlePrintAndScan.disconnectFromBluetoothDevice(device.id);
+      
+      // Update connected devices list
+      const updatedConnectedDevices = await BlePrintAndScan.getConnectedDevices();
+      setConnectedDevices(updatedConnectedDevices);
+      
+      // Clear selected device if it was disconnected
+      if (selectedDevice?.id === device.id) {
+        setSelectedDevice(null);
+      }
+      
+      Alert.alert('Success', `Disconnected from ${device.name}`);
     } catch (error) {
-      Alert.alert('Error', `Failed to disconnect: ${error}`);
+      Alert.alert('Error', `Failed to disconnect from ${device.name}: ${error}`);
+    }
+  };
+
+  const disconnectAllDevices = async () => {
+    try {
+      await BlePrintAndScan.disconnectAllDevices();
+      setConnectedDevices([]);
+      setSelectedDevice(null);
+      Alert.alert('Success', 'Disconnected from all devices');
+    } catch (error) {
+      Alert.alert('Error', `Failed to disconnect all devices: ${error}`);
     }
   };
 
   const printReceipt = async () => {
-    if (!connectedDevice) {
-      Alert.alert('Error', 'No device connected');
+    if (!selectedDevice) {
+      Alert.alert('Error', 'No device selected for printing');
       return;
     }
 
@@ -98,8 +123,8 @@ export default function HomeScreen() {
       const base64Data = cachedScreenshot.split(',')[1];
       console.log("Base64 data only, length:", base64Data.length);
 
-      await BlePrintAndScan.sendToBluetoothThermalPrinter(base64Data, 384); // Standard thermal printer width
-      Alert.alert('Success', 'Receipt printed successfully');
+      await BlePrintAndScan.sendToBluetoothThermalPrinter(selectedDevice.id, base64Data, 384); // Standard thermal printer width
+      Alert.alert('Success', `Receipt printed successfully to ${selectedDevice.name}`);
     } catch (error) {
       console.error('Error printing receipt:', error);
       Alert.alert('Error', 'Failed to print receipt');
@@ -115,9 +140,12 @@ export default function HomeScreen() {
         <Text style={styles.statusText}>
           Status: {isInitialized ? 'Initialized' : 'Not Initialized'}
         </Text>
-        {connectedDevice && (
+        <Text style={styles.statusText}>
+          Connected Devices: {connectedDevices.length}
+        </Text>
+        {selectedDevice && (
           <Text style={styles.statusText}>
-            Connected: {connectedDevice.name}
+            Selected for Printing: {selectedDevice.name}
           </Text>
         )}
       </View>
@@ -139,17 +167,18 @@ export default function HomeScreen() {
           </TouchableOpacity>
         )}
 
-        {connectedDevice && (
+        {connectedDevices.length > 0 && (
           <>
-            <TouchableOpacity style={styles.button} onPress={disconnectDevice}>
-              <Text style={styles.buttonText}>Disconnect</Text>
+            <TouchableOpacity style={styles.button} onPress={disconnectAllDevices}>
+              <Text style={styles.buttonText}>Disconnect All Devices</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.button}
+              style={[styles.button, !selectedDevice && styles.buttonDisabled]}
               onPress={() => setShowPreviewModal(true)}
+              disabled={!selectedDevice}
             >
-              <Text style={styles.buttonText}>Print Preview Test Receipt</Text>
+              <Text style={styles.buttonText}>Print Receipt to Selected Device</Text>
             </TouchableOpacity>
           </>
         )}
@@ -183,19 +212,49 @@ export default function HomeScreen() {
 
       <ScrollView style={styles.deviceList}>
         <Text style={styles.deviceListTitle}>Discovered Devices:</Text>
-        {devices.map((device, index) => (
-          <TouchableOpacity
-            key={index}
-            style={[
-              styles.deviceItem,
-              connectedDevice?.id === device.id && styles.connectedDevice
-            ]}
-            onPress={() => connectToDevice(device)}
-          >
-            <Text style={styles.deviceName}>{device.name}</Text>
-            <Text style={styles.deviceId}>{device.id}</Text>
-          </TouchableOpacity>
-        ))}
+        {devices.map((device, index) => {
+          const isConnected = connectedDevices.some(connectedDevice => connectedDevice.id === device.id);
+          const isSelected = selectedDevice?.id === device.id;
+          
+          return (
+            <TouchableOpacity
+              key={index}
+              style={[
+                styles.deviceItem,
+                isConnected && styles.connectedDevice,
+                isSelected && styles.selectedDevice
+              ]}
+              onPress={() => {
+                if (isConnected) {
+                  // If connected, select/deselect for printing
+                  setSelectedDevice(isSelected ? null : device);
+                } else {
+                  // If not connected, connect to device
+                  connectToDevice(device);
+                }
+              }}
+              onLongPress={() => {
+                if (isConnected) {
+                  // Long press to disconnect
+                  disconnectDevice(device);
+                }
+              }}
+            >
+              <View style={styles.deviceInfo}>
+                <Text style={styles.deviceName}>{device.name}</Text>
+                <Text style={styles.deviceId}>{device.id}</Text>
+              </View>
+              <View style={styles.deviceStatus}>
+                {isConnected && <Text style={styles.statusBadge}>Connected</Text>}
+                {isSelected && <Text style={styles.statusBadge}>Selected</Text>}
+              </View>
+            </TouchableOpacity>
+          );
+        })}
+        
+        {devices.length === 0 && !isScanning && (
+          <Text style={styles.noDevicesText}>No devices found. Start scanning to discover devices.</Text>
+        )}
       </ScrollView>
     </View>
   );
@@ -278,12 +337,34 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   deviceItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     padding: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#eeeeee',
   },
   connectedDevice: {
     backgroundColor: '#e8f5e8',
+  },
+  selectedDevice: {
+    backgroundColor: '#e8f0ff',
+  },
+  deviceInfo: {
+    flex: 1,
+  },
+  deviceStatus: {
+    flexDirection: 'row',
+    gap: 5,
+  },
+  statusBadge: {
+    fontSize: 10,
+    color: '#007AFF',
+    backgroundColor: '#e8f0ff',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    overflow: 'hidden',
   },
   deviceName: {
     fontSize: 16,
@@ -293,6 +374,12 @@ const styles = StyleSheet.create({
   deviceId: {
     fontSize: 12,
     color: '#666666',
+  },
+  noDevicesText: {
+    textAlign: 'center',
+    color: '#666666',
+    marginTop: 20,
+    fontStyle: 'italic',
   },
   modalContainer: {
     flex: 1,

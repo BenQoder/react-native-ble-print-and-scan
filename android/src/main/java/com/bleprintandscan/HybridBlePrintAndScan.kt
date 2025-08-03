@@ -100,9 +100,30 @@ class HybridBlePrintAndScan: HybridBlePrintAndScanSpec() {
         }
     }
     
-    override fun disconnectFromBluetoothDevice(): Promise<Unit> {
+    override fun disconnectFromBluetoothDevice(deviceId: String): Promise<Unit> {
         return Promise.async {
-            bluetoothManager.disconnect()
+            bluetoothManager.disconnect(deviceId)
+        }
+    }
+    
+    override fun isDeviceConnected(deviceId: String): Promise<Boolean> {
+        return Promise.async {
+            bluetoothManager.isConnected(deviceId)
+        }
+    }
+    
+    override fun getConnectedDevices(): Promise<Array<Device>> {
+        return Promise.async {
+            val connectedDevices = bluetoothManager.getConnectedDevices()
+            connectedDevices.map { device ->
+                Device(device["id"]!!, device["name"]!!)
+            }.toTypedArray()
+        }
+    }
+    
+    override fun disconnectAllDevices(): Promise<Unit> {
+        return Promise.async {
+            bluetoothManager.disconnectAllDevices()
         }
     }
     
@@ -120,16 +141,20 @@ class HybridBlePrintAndScan: HybridBlePrintAndScanSpec() {
         }
     }
     
-    override fun sendToBluetoothThermalPrinter(value: String, printerWidth: Double): Promise<Unit> {
+    override fun sendToBluetoothThermalPrinter(deviceId: String, value: String, printerWidth: Double): Promise<Unit> {
         return Promise.async {
             if (!bluetoothManager.isBluetoothEnabled()) {
                 throw Exception("Please enable bluetooth")
             }
             
-            val mtuSize = bluetoothManager.getAllowedMtu()
+            if (!bluetoothManager.isConnected(deviceId)) {
+                throw Exception("Device $deviceId is not connected")
+            }
+            
+            val mtuSize = bluetoothManager.getAllowedMtu(deviceId)
             val lines = prepareImageForThermalPrinter(value, printerWidth.toInt(), mtuSize)
             
-            bluetoothManager.printWithDevice(lines)
+            bluetoothManager.printWithDevice(deviceId, lines)
         }
     }
     
