@@ -1,124 +1,123 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, TouchableOpacity, ScrollView, Alert, View, Text } from 'react-native';
-import { BlePrintAndScan, type Device } from "react-native-ble-print-and-scan";
+import { BleScanner, type Device } from "react-native-ble-print-and-scan";
 import { router } from 'expo-router';
 
-export default function HomeScreen() {
-  const [devices, setDevices] = useState<Device[]>([]);
+export default function ScannerScreen() {
+  const [scanners, setScanners] = useState<Device[]>([]);
   const [isScanning, setIsScanning] = useState(false);
-  const [connectedDevices, setConnectedDevices] = useState<Device[]>([]);
+  const [connectedScanners, setConnectedScanners] = useState<Device[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    initializeBluetooth();
+    initializeScanner();
   }, []);
 
-  const initializeBluetooth = async () => {
+  const initializeScanner = async () => {
     try {
-      await BlePrintAndScan.initializeBluetooth();
+      await BleScanner.initializeScanner();
       setIsInitialized(true);
-      Alert.alert('Success', 'Bluetooth initialized successfully');
+      Alert.alert('Success', 'Scanner initialized successfully');
     } catch (error) {
-      Alert.alert('Error', `Failed to initialize Bluetooth: ${error}`);
+      Alert.alert('Error', `Failed to initialize Scanner: ${error}`);
     }
   };
 
-  const scanForDevices = async () => {
+  const scanForScanners = async () => {
     if (!isInitialized) {
-      Alert.alert('Error', 'Bluetooth not initialized');
+      Alert.alert('Error', 'Scanner not initialized');
       return;
     }
 
     try {
       setIsScanning(true);
-      setDevices([]);
+      setScanners([]);
 
-      await BlePrintAndScan.startScanningForBluetoothDevices((foundDevices: Device[]) => {
-        setDevices(foundDevices);
+      await BleScanner.startScanningForScanners((foundScanners: Device[]) => {
+        setScanners(foundScanners);
       });
 
     } catch (error) {
       setIsScanning(false);
-      Alert.alert('Error', `Failed to scan for devices: ${error}`);
+      Alert.alert('Error', `Failed to scan for scanners: ${error}`);
     }
   };
 
   const stopScanning = async () => {
     try {
-      await BlePrintAndScan.suspendScanForBluetoothDevices();
+      await BleScanner.suspendScanForScanners();
       setIsScanning(false);
     } catch (error) {
       Alert.alert('Error', `Failed to stop scanning: ${error}`);
     }
   };
 
-  const connectToDevice = async (device: Device) => {
+  const connectToScanner = async (scanner: Device) => {
     try {
-      await BlePrintAndScan.connectToBluetoothDevice(device.id);
+      await BleScanner.connectToScanner(scanner.id);
       
-      // Update connected devices list
-      const updatedConnectedDevices = await BlePrintAndScan.getConnectedDevices();
-      setConnectedDevices(updatedConnectedDevices);
+      // Update connected scanners list
+      const updatedConnectedScanners = await BleScanner.getConnectedScanners();
+      setConnectedScanners(updatedConnectedScanners);
       
-      Alert.alert('Success', `Connected to ${device.name}`);
+      Alert.alert('Success', `Connected to ${scanner.name}`);
     } catch (error) {
-      Alert.alert('Error', `Failed to connect to ${device.name}: ${error}`);
+      Alert.alert('Error', `Failed to connect to ${scanner.name}: ${error}`);
     }
   };
 
-  const disconnectDevice = async (device: Device) => {
+  const disconnectScanner = async (scanner: Device) => {
     try {
-      await BlePrintAndScan.disconnectFromBluetoothDevice(device.id);
+      await BleScanner.disconnectFromScanner(scanner.id);
       
-      // Update connected devices list
-      const updatedConnectedDevices = await BlePrintAndScan.getConnectedDevices();
-      setConnectedDevices(updatedConnectedDevices);
+      // Update connected scanners list
+      const updatedConnectedScanners = await BleScanner.getConnectedScanners();
+      setConnectedScanners(updatedConnectedScanners);
       
       
-      Alert.alert('Success', `Disconnected from ${device.name}`);
+      Alert.alert('Success', `Disconnected from ${scanner.name}`);
     } catch (error) {
-      Alert.alert('Error', `Failed to disconnect from ${device.name}: ${error}`);
+      Alert.alert('Error', `Failed to disconnect from ${scanner.name}: ${error}`);
     }
   };
 
-  const disconnectAllDevices = async () => {
+  const disconnectAllScanners = async () => {
     try {
-      await BlePrintAndScan.disconnectAllDevices();
-      setConnectedDevices([]);
-      Alert.alert('Success', 'Disconnected from all devices');
+      await BleScanner.disconnectAllScanners();
+      setConnectedScanners([]);
+      Alert.alert('Success', 'Disconnected from all scanners');
     } catch (error) {
-      Alert.alert('Error', `Failed to disconnect all devices: ${error}`);
+      Alert.alert('Error', `Failed to disconnect all scanners: ${error}`);
     }
   };
 
-  const openPrinterScreen = (device: Device) => {
+  const openScannerScreen = (scanner: Device) => {
+    console.log('Navigating to scanner control for:', scanner.name);
     router.push({
-      pathname: '/printer',
-      params: { deviceId: device.id, deviceName: device.name }
+      pathname: '/scanner-control',
+      params: { deviceId: scanner.id, deviceName: scanner.name }
     });
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.subtitle}>Sum Test: {BlePrintAndScan.sum(1, 2)}</Text>
-
       <View style={styles.statusContainer}>
         <Text style={styles.statusText}>
           Status: {isInitialized ? 'Initialized' : 'Not Initialized'}
         </Text>
         <Text style={styles.statusText}>
-          Connected Devices: {connectedDevices.length}
+          Connected Scanners: {connectedScanners.length}
         </Text>
       </View>
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.button, isScanning && styles.buttonDisabled]}
-          onPress={scanForDevices}
+          onPress={scanForScanners}
           disabled={isScanning}
         >
           <Text style={styles.buttonText}>
-            {isScanning ? 'Scanning...' : 'Scan for Devices'}
+            {isScanning ? 'Scanning...' : 'Scan for Scanners'}
           </Text>
         </TouchableOpacity>
 
@@ -128,17 +127,17 @@ export default function HomeScreen() {
           </TouchableOpacity>
         )}
 
-        {connectedDevices.length > 0 && (
-          <TouchableOpacity style={styles.button} onPress={disconnectAllDevices}>
-            <Text style={styles.buttonText}>Disconnect All Devices</Text>
+        {connectedScanners.length > 0 && (
+          <TouchableOpacity style={styles.button} onPress={disconnectAllScanners}>
+            <Text style={styles.buttonText}>Disconnect All Scanners</Text>
           </TouchableOpacity>
         )}
       </View>
 
       <ScrollView style={styles.deviceList}>
-        <Text style={styles.deviceListTitle}>Discovered Devices:</Text>
-        {devices.map((device, index) => {
-          const isConnected = connectedDevices.some(connectedDevice => connectedDevice.id === device.id);
+        <Text style={styles.deviceListTitle}>Discovered Scanners:</Text>
+        {scanners.map((scanner, index) => {
+          const isConnected = connectedScanners.some(connectedScanner => connectedScanner.id === scanner.id);
           
           return (
             <TouchableOpacity
@@ -148,24 +147,22 @@ export default function HomeScreen() {
                 isConnected && styles.connectedDevice
               ]}
               onPress={() => {
+                console.log('Scanner tapped:', scanner.name, 'Connected:', isConnected);
                 if (isConnected) {
-                  // If connected, open printer screen
-                  openPrinterScreen(device);
+                  openScannerScreen(scanner);
                 } else {
-                  // If not connected, connect to device
-                  connectToDevice(device);
+                  connectToScanner(scanner);
                 }
               }}
               onLongPress={() => {
                 if (isConnected) {
-                  // Long press to disconnect
-                  disconnectDevice(device);
+                  disconnectScanner(scanner);
                 }
               }}
             >
               <View style={styles.deviceInfo}>
-                <Text style={styles.deviceName}>{device.name}</Text>
-                <Text style={styles.deviceId}>{device.id}</Text>
+                <Text style={styles.deviceName}>{scanner.name}</Text>
+                <Text style={styles.deviceId}>{scanner.id}</Text>
               </View>
               <View style={styles.deviceStatus}>
                 {isConnected && <Text style={styles.statusBadge}>Connected</Text>}
@@ -174,10 +171,11 @@ export default function HomeScreen() {
           );
         })}
         
-        {devices.length === 0 && !isScanning && (
-          <Text style={styles.noDevicesText}>No devices found. Start scanning to discover devices.</Text>
+        {scanners.length === 0 && !isScanning && (
+          <Text style={styles.noDevicesText}>No scanners found. Start scanning to discover scanners.</Text>
         )}
       </ScrollView>
+
     </View>
   );
 }
@@ -187,12 +185,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: '#f5f5f5',
-  },
-  subtitle: {
-    fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 20,
-    color: 'green',
   },
   statusContainer: {
     backgroundColor: 'white',
@@ -227,6 +219,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 8,
     padding: 10,
+    marginBottom: 10,
   },
   deviceListTitle: {
     fontSize: 18,

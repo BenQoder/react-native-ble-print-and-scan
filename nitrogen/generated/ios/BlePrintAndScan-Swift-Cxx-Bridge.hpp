@@ -12,18 +12,50 @@
 namespace NitroModules { class ArrayBufferHolder; }
 // Forward declaration of `ArrayBuffer` to properly resolve imports.
 namespace NitroModules { class ArrayBuffer; }
+// Forward declaration of `BeepSettings` to properly resolve imports.
+namespace margelo::nitro::bleprintandscan { struct BeepSettings; }
+// Forward declaration of `BeepTone` to properly resolve imports.
+namespace margelo::nitro::bleprintandscan { enum class BeepTone; }
+// Forward declaration of `BeepVolume` to properly resolve imports.
+namespace margelo::nitro::bleprintandscan { enum class BeepVolume; }
+// Forward declaration of `DataFormatSettings` to properly resolve imports.
+namespace margelo::nitro::bleprintandscan { struct DataFormatSettings; }
 // Forward declaration of `Device` to properly resolve imports.
 namespace margelo::nitro::bleprintandscan { struct Device; }
 // Forward declaration of `HybridBlePrintAndScanSpec` to properly resolve imports.
 namespace margelo::nitro::bleprintandscan { class HybridBlePrintAndScanSpec; }
+// Forward declaration of `HybridBleScannerSpec` to properly resolve imports.
+namespace margelo::nitro::bleprintandscan { class HybridBleScannerSpec; }
+// Forward declaration of `PowerSettings` to properly resolve imports.
+namespace margelo::nitro::bleprintandscan { struct PowerSettings; }
+// Forward declaration of `ScanResult` to properly resolve imports.
+namespace margelo::nitro::bleprintandscan { struct ScanResult; }
+// Forward declaration of `ScannerCurrentSettings` to properly resolve imports.
+namespace margelo::nitro::bleprintandscan { struct ScannerCurrentSettings; }
+// Forward declaration of `ScannerInfo` to properly resolve imports.
+namespace margelo::nitro::bleprintandscan { struct ScannerInfo; }
+// Forward declaration of `ScannerMode` to properly resolve imports.
+namespace margelo::nitro::bleprintandscan { enum class ScannerMode; }
 
 // Forward declarations of Swift defined types
 // Forward declaration of `HybridBlePrintAndScanSpec_cxx` to properly resolve imports.
 namespace BlePrintAndScan { class HybridBlePrintAndScanSpec_cxx; }
+// Forward declaration of `HybridBleScannerSpec_cxx` to properly resolve imports.
+namespace BlePrintAndScan { class HybridBleScannerSpec_cxx; }
 
 // Include C++ defined types
+#include "BeepSettings.hpp"
+#include "BeepTone.hpp"
+#include "BeepVolume.hpp"
+#include "DataFormatSettings.hpp"
 #include "Device.hpp"
 #include "HybridBlePrintAndScanSpec.hpp"
+#include "HybridBleScannerSpec.hpp"
+#include "PowerSettings.hpp"
+#include "ScanResult.hpp"
+#include "ScannerCurrentSettings.hpp"
+#include "ScannerInfo.hpp"
+#include "ScannerMode.hpp"
 #include <NitroModules/ArrayBuffer.hpp>
 #include <NitroModules/ArrayBufferHolder.hpp>
 #include <NitroModules/Promise.hpp>
@@ -32,6 +64,7 @@ namespace BlePrintAndScan { class HybridBlePrintAndScanSpec_cxx; }
 #include <exception>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -330,6 +363,284 @@ namespace margelo::nitro::bleprintandscan::bridge::swift {
   }
   inline Result_std__shared_ptr_Promise_std__vector_std__string____ create_Result_std__shared_ptr_Promise_std__vector_std__string____(const std::exception_ptr& error) {
     return Result<std::shared_ptr<Promise<std::vector<std::string>>>>::withError(error);
+  }
+  
+  // pragma MARK: std::optional<double>
+  /**
+   * Specialized version of `std::optional<double>`.
+   */
+  using std__optional_double_ = std::optional<double>;
+  inline std::optional<double> create_std__optional_double_(const double& value) {
+    return std::optional<double>(value);
+  }
+  
+  // pragma MARK: std::shared_ptr<Promise<ScannerInfo>>
+  /**
+   * Specialized version of `std::shared_ptr<Promise<ScannerInfo>>`.
+   */
+  using std__shared_ptr_Promise_ScannerInfo__ = std::shared_ptr<Promise<ScannerInfo>>;
+  inline std::shared_ptr<Promise<ScannerInfo>> create_std__shared_ptr_Promise_ScannerInfo__() {
+    return Promise<ScannerInfo>::create();
+  }
+  inline PromiseHolder<ScannerInfo> wrap_std__shared_ptr_Promise_ScannerInfo__(std::shared_ptr<Promise<ScannerInfo>> promise) {
+    return PromiseHolder<ScannerInfo>(std::move(promise));
+  }
+  
+  // pragma MARK: std::function<void(const ScannerInfo& /* result */)>
+  /**
+   * Specialized version of `std::function<void(const ScannerInfo&)>`.
+   */
+  using Func_void_ScannerInfo = std::function<void(const ScannerInfo& /* result */)>;
+  /**
+   * Wrapper class for a `std::function<void(const ScannerInfo& / * result * /)>`, this can be used from Swift.
+   */
+  class Func_void_ScannerInfo_Wrapper final {
+  public:
+    explicit Func_void_ScannerInfo_Wrapper(std::function<void(const ScannerInfo& /* result */)>&& func): _function(std::make_unique<std::function<void(const ScannerInfo& /* result */)>>(std::move(func))) {}
+    inline void call(ScannerInfo result) const {
+      _function->operator()(result);
+    }
+  private:
+    std::unique_ptr<std::function<void(const ScannerInfo& /* result */)>> _function;
+  } SWIFT_NONCOPYABLE;
+  Func_void_ScannerInfo create_Func_void_ScannerInfo(void* _Nonnull swiftClosureWrapper);
+  inline Func_void_ScannerInfo_Wrapper wrap_Func_void_ScannerInfo(Func_void_ScannerInfo value) {
+    return Func_void_ScannerInfo_Wrapper(std::move(value));
+  }
+  
+  // pragma MARK: std::shared_ptr<Promise<ScannerCurrentSettings>>
+  /**
+   * Specialized version of `std::shared_ptr<Promise<ScannerCurrentSettings>>`.
+   */
+  using std__shared_ptr_Promise_ScannerCurrentSettings__ = std::shared_ptr<Promise<ScannerCurrentSettings>>;
+  inline std::shared_ptr<Promise<ScannerCurrentSettings>> create_std__shared_ptr_Promise_ScannerCurrentSettings__() {
+    return Promise<ScannerCurrentSettings>::create();
+  }
+  inline PromiseHolder<ScannerCurrentSettings> wrap_std__shared_ptr_Promise_ScannerCurrentSettings__(std::shared_ptr<Promise<ScannerCurrentSettings>> promise) {
+    return PromiseHolder<ScannerCurrentSettings>(std::move(promise));
+  }
+  
+  // pragma MARK: std::function<void(const ScannerCurrentSettings& /* result */)>
+  /**
+   * Specialized version of `std::function<void(const ScannerCurrentSettings&)>`.
+   */
+  using Func_void_ScannerCurrentSettings = std::function<void(const ScannerCurrentSettings& /* result */)>;
+  /**
+   * Wrapper class for a `std::function<void(const ScannerCurrentSettings& / * result * /)>`, this can be used from Swift.
+   */
+  class Func_void_ScannerCurrentSettings_Wrapper final {
+  public:
+    explicit Func_void_ScannerCurrentSettings_Wrapper(std::function<void(const ScannerCurrentSettings& /* result */)>&& func): _function(std::make_unique<std::function<void(const ScannerCurrentSettings& /* result */)>>(std::move(func))) {}
+    inline void call(ScannerCurrentSettings result) const {
+      _function->operator()(result);
+    }
+  private:
+    std::unique_ptr<std::function<void(const ScannerCurrentSettings& /* result */)>> _function;
+  } SWIFT_NONCOPYABLE;
+  Func_void_ScannerCurrentSettings create_Func_void_ScannerCurrentSettings(void* _Nonnull swiftClosureWrapper);
+  inline Func_void_ScannerCurrentSettings_Wrapper wrap_Func_void_ScannerCurrentSettings(Func_void_ScannerCurrentSettings value) {
+    return Func_void_ScannerCurrentSettings_Wrapper(std::move(value));
+  }
+  
+  // pragma MARK: std::function<void(const ScanResult& /* result */)>
+  /**
+   * Specialized version of `std::function<void(const ScanResult&)>`.
+   */
+  using Func_void_ScanResult = std::function<void(const ScanResult& /* result */)>;
+  /**
+   * Wrapper class for a `std::function<void(const ScanResult& / * result * /)>`, this can be used from Swift.
+   */
+  class Func_void_ScanResult_Wrapper final {
+  public:
+    explicit Func_void_ScanResult_Wrapper(std::function<void(const ScanResult& /* result */)>&& func): _function(std::make_unique<std::function<void(const ScanResult& /* result */)>>(std::move(func))) {}
+    inline void call(ScanResult result) const {
+      _function->operator()(result);
+    }
+  private:
+    std::unique_ptr<std::function<void(const ScanResult& /* result */)>> _function;
+  } SWIFT_NONCOPYABLE;
+  Func_void_ScanResult create_Func_void_ScanResult(void* _Nonnull swiftClosureWrapper);
+  inline Func_void_ScanResult_Wrapper wrap_Func_void_ScanResult(Func_void_ScanResult value) {
+    return Func_void_ScanResult_Wrapper(std::move(value));
+  }
+  
+  // pragma MARK: std::optional<std::string>
+  /**
+   * Specialized version of `std::optional<std::string>`.
+   */
+  using std__optional_std__string_ = std::optional<std::string>;
+  inline std::optional<std::string> create_std__optional_std__string_(const std::string& value) {
+    return std::optional<std::string>(value);
+  }
+  
+  // pragma MARK: std::shared_ptr<Promise<double>>
+  /**
+   * Specialized version of `std::shared_ptr<Promise<double>>`.
+   */
+  using std__shared_ptr_Promise_double__ = std::shared_ptr<Promise<double>>;
+  inline std::shared_ptr<Promise<double>> create_std__shared_ptr_Promise_double__() {
+    return Promise<double>::create();
+  }
+  inline PromiseHolder<double> wrap_std__shared_ptr_Promise_double__(std::shared_ptr<Promise<double>> promise) {
+    return PromiseHolder<double>(std::move(promise));
+  }
+  
+  // pragma MARK: std::function<void(double /* result */)>
+  /**
+   * Specialized version of `std::function<void(double)>`.
+   */
+  using Func_void_double = std::function<void(double /* result */)>;
+  /**
+   * Wrapper class for a `std::function<void(double / * result * /)>`, this can be used from Swift.
+   */
+  class Func_void_double_Wrapper final {
+  public:
+    explicit Func_void_double_Wrapper(std::function<void(double /* result */)>&& func): _function(std::make_unique<std::function<void(double /* result */)>>(std::move(func))) {}
+    inline void call(double result) const {
+      _function->operator()(result);
+    }
+  private:
+    std::unique_ptr<std::function<void(double /* result */)>> _function;
+  } SWIFT_NONCOPYABLE;
+  Func_void_double create_Func_void_double(void* _Nonnull swiftClosureWrapper);
+  inline Func_void_double_Wrapper wrap_Func_void_double(Func_void_double value) {
+    return Func_void_double_Wrapper(std::move(value));
+  }
+  
+  // pragma MARK: std::vector<ScanResult>
+  /**
+   * Specialized version of `std::vector<ScanResult>`.
+   */
+  using std__vector_ScanResult_ = std::vector<ScanResult>;
+  inline std::vector<ScanResult> create_std__vector_ScanResult_(size_t size) {
+    std::vector<ScanResult> vector;
+    vector.reserve(size);
+    return vector;
+  }
+  
+  // pragma MARK: std::shared_ptr<Promise<std::vector<ScanResult>>>
+  /**
+   * Specialized version of `std::shared_ptr<Promise<std::vector<ScanResult>>>`.
+   */
+  using std__shared_ptr_Promise_std__vector_ScanResult___ = std::shared_ptr<Promise<std::vector<ScanResult>>>;
+  inline std::shared_ptr<Promise<std::vector<ScanResult>>> create_std__shared_ptr_Promise_std__vector_ScanResult___() {
+    return Promise<std::vector<ScanResult>>::create();
+  }
+  inline PromiseHolder<std::vector<ScanResult>> wrap_std__shared_ptr_Promise_std__vector_ScanResult___(std::shared_ptr<Promise<std::vector<ScanResult>>> promise) {
+    return PromiseHolder<std::vector<ScanResult>>(std::move(promise));
+  }
+  
+  // pragma MARK: std::function<void(const std::vector<ScanResult>& /* result */)>
+  /**
+   * Specialized version of `std::function<void(const std::vector<ScanResult>&)>`.
+   */
+  using Func_void_std__vector_ScanResult_ = std::function<void(const std::vector<ScanResult>& /* result */)>;
+  /**
+   * Wrapper class for a `std::function<void(const std::vector<ScanResult>& / * result * /)>`, this can be used from Swift.
+   */
+  class Func_void_std__vector_ScanResult__Wrapper final {
+  public:
+    explicit Func_void_std__vector_ScanResult__Wrapper(std::function<void(const std::vector<ScanResult>& /* result */)>&& func): _function(std::make_unique<std::function<void(const std::vector<ScanResult>& /* result */)>>(std::move(func))) {}
+    inline void call(std::vector<ScanResult> result) const {
+      _function->operator()(result);
+    }
+  private:
+    std::unique_ptr<std::function<void(const std::vector<ScanResult>& /* result */)>> _function;
+  } SWIFT_NONCOPYABLE;
+  Func_void_std__vector_ScanResult_ create_Func_void_std__vector_ScanResult_(void* _Nonnull swiftClosureWrapper);
+  inline Func_void_std__vector_ScanResult__Wrapper wrap_Func_void_std__vector_ScanResult_(Func_void_std__vector_ScanResult_ value) {
+    return Func_void_std__vector_ScanResult__Wrapper(std::move(value));
+  }
+  
+  // pragma MARK: std::shared_ptr<Promise<std::string>>
+  /**
+   * Specialized version of `std::shared_ptr<Promise<std::string>>`.
+   */
+  using std__shared_ptr_Promise_std__string__ = std::shared_ptr<Promise<std::string>>;
+  inline std::shared_ptr<Promise<std::string>> create_std__shared_ptr_Promise_std__string__() {
+    return Promise<std::string>::create();
+  }
+  inline PromiseHolder<std::string> wrap_std__shared_ptr_Promise_std__string__(std::shared_ptr<Promise<std::string>> promise) {
+    return PromiseHolder<std::string>(std::move(promise));
+  }
+  
+  // pragma MARK: std::function<void(const std::string& /* result */)>
+  /**
+   * Specialized version of `std::function<void(const std::string&)>`.
+   */
+  using Func_void_std__string = std::function<void(const std::string& /* result */)>;
+  /**
+   * Wrapper class for a `std::function<void(const std::string& / * result * /)>`, this can be used from Swift.
+   */
+  class Func_void_std__string_Wrapper final {
+  public:
+    explicit Func_void_std__string_Wrapper(std::function<void(const std::string& /* result */)>&& func): _function(std::make_unique<std::function<void(const std::string& /* result */)>>(std::move(func))) {}
+    inline void call(std::string result) const {
+      _function->operator()(result);
+    }
+  private:
+    std::unique_ptr<std::function<void(const std::string& /* result */)>> _function;
+  } SWIFT_NONCOPYABLE;
+  Func_void_std__string create_Func_void_std__string(void* _Nonnull swiftClosureWrapper);
+  inline Func_void_std__string_Wrapper wrap_Func_void_std__string(Func_void_std__string value) {
+    return Func_void_std__string_Wrapper(std::move(value));
+  }
+  
+  // pragma MARK: std::shared_ptr<margelo::nitro::bleprintandscan::HybridBleScannerSpec>
+  /**
+   * Specialized version of `std::shared_ptr<margelo::nitro::bleprintandscan::HybridBleScannerSpec>`.
+   */
+  using std__shared_ptr_margelo__nitro__bleprintandscan__HybridBleScannerSpec_ = std::shared_ptr<margelo::nitro::bleprintandscan::HybridBleScannerSpec>;
+  std::shared_ptr<margelo::nitro::bleprintandscan::HybridBleScannerSpec> create_std__shared_ptr_margelo__nitro__bleprintandscan__HybridBleScannerSpec_(void* _Nonnull swiftUnsafePointer);
+  void* _Nonnull get_std__shared_ptr_margelo__nitro__bleprintandscan__HybridBleScannerSpec_(std__shared_ptr_margelo__nitro__bleprintandscan__HybridBleScannerSpec_ cppType);
+  
+  // pragma MARK: std::weak_ptr<margelo::nitro::bleprintandscan::HybridBleScannerSpec>
+  using std__weak_ptr_margelo__nitro__bleprintandscan__HybridBleScannerSpec_ = std::weak_ptr<margelo::nitro::bleprintandscan::HybridBleScannerSpec>;
+  inline std__weak_ptr_margelo__nitro__bleprintandscan__HybridBleScannerSpec_ weakify_std__shared_ptr_margelo__nitro__bleprintandscan__HybridBleScannerSpec_(const std::shared_ptr<margelo::nitro::bleprintandscan::HybridBleScannerSpec>& strong) { return strong; }
+  
+  // pragma MARK: Result<std::shared_ptr<Promise<ScannerInfo>>>
+  using Result_std__shared_ptr_Promise_ScannerInfo___ = Result<std::shared_ptr<Promise<ScannerInfo>>>;
+  inline Result_std__shared_ptr_Promise_ScannerInfo___ create_Result_std__shared_ptr_Promise_ScannerInfo___(const std::shared_ptr<Promise<ScannerInfo>>& value) {
+    return Result<std::shared_ptr<Promise<ScannerInfo>>>::withValue(value);
+  }
+  inline Result_std__shared_ptr_Promise_ScannerInfo___ create_Result_std__shared_ptr_Promise_ScannerInfo___(const std::exception_ptr& error) {
+    return Result<std::shared_ptr<Promise<ScannerInfo>>>::withError(error);
+  }
+  
+  // pragma MARK: Result<std::shared_ptr<Promise<ScannerCurrentSettings>>>
+  using Result_std__shared_ptr_Promise_ScannerCurrentSettings___ = Result<std::shared_ptr<Promise<ScannerCurrentSettings>>>;
+  inline Result_std__shared_ptr_Promise_ScannerCurrentSettings___ create_Result_std__shared_ptr_Promise_ScannerCurrentSettings___(const std::shared_ptr<Promise<ScannerCurrentSettings>>& value) {
+    return Result<std::shared_ptr<Promise<ScannerCurrentSettings>>>::withValue(value);
+  }
+  inline Result_std__shared_ptr_Promise_ScannerCurrentSettings___ create_Result_std__shared_ptr_Promise_ScannerCurrentSettings___(const std::exception_ptr& error) {
+    return Result<std::shared_ptr<Promise<ScannerCurrentSettings>>>::withError(error);
+  }
+  
+  // pragma MARK: Result<std::shared_ptr<Promise<double>>>
+  using Result_std__shared_ptr_Promise_double___ = Result<std::shared_ptr<Promise<double>>>;
+  inline Result_std__shared_ptr_Promise_double___ create_Result_std__shared_ptr_Promise_double___(const std::shared_ptr<Promise<double>>& value) {
+    return Result<std::shared_ptr<Promise<double>>>::withValue(value);
+  }
+  inline Result_std__shared_ptr_Promise_double___ create_Result_std__shared_ptr_Promise_double___(const std::exception_ptr& error) {
+    return Result<std::shared_ptr<Promise<double>>>::withError(error);
+  }
+  
+  // pragma MARK: Result<std::shared_ptr<Promise<std::vector<ScanResult>>>>
+  using Result_std__shared_ptr_Promise_std__vector_ScanResult____ = Result<std::shared_ptr<Promise<std::vector<ScanResult>>>>;
+  inline Result_std__shared_ptr_Promise_std__vector_ScanResult____ create_Result_std__shared_ptr_Promise_std__vector_ScanResult____(const std::shared_ptr<Promise<std::vector<ScanResult>>>& value) {
+    return Result<std::shared_ptr<Promise<std::vector<ScanResult>>>>::withValue(value);
+  }
+  inline Result_std__shared_ptr_Promise_std__vector_ScanResult____ create_Result_std__shared_ptr_Promise_std__vector_ScanResult____(const std::exception_ptr& error) {
+    return Result<std::shared_ptr<Promise<std::vector<ScanResult>>>>::withError(error);
+  }
+  
+  // pragma MARK: Result<std::shared_ptr<Promise<std::string>>>
+  using Result_std__shared_ptr_Promise_std__string___ = Result<std::shared_ptr<Promise<std::string>>>;
+  inline Result_std__shared_ptr_Promise_std__string___ create_Result_std__shared_ptr_Promise_std__string___(const std::shared_ptr<Promise<std::string>>& value) {
+    return Result<std::shared_ptr<Promise<std::string>>>::withValue(value);
+  }
+  inline Result_std__shared_ptr_Promise_std__string___ create_Result_std__shared_ptr_Promise_std__string___(const std::exception_ptr& error) {
+    return Result<std::shared_ptr<Promise<std::string>>>::withError(error);
   }
 
 } // namespace margelo::nitro::bleprintandscan::bridge::swift

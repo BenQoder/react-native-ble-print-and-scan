@@ -16,6 +16,10 @@
     "BlePrintAndScan": {
       "swift": "HybridBlePrintAndScan",
       "kotlin": "HybridBlePrintAndScan"
+    },
+    "BleScanner": {
+      "swift": "HybridBleScanner",
+      "kotlin": "HybridBleScanner"
     }
   },
   "ignorePaths": [

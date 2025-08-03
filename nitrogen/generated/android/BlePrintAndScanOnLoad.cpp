@@ -17,6 +17,8 @@
 
 #include "JHybridBlePrintAndScanSpec.hpp"
 #include "JFunc_void_std__vector_Device_.hpp"
+#include "JHybridBleScannerSpec.hpp"
+#include "JFunc_void_ScanResult.hpp"
 #include <NitroModules/JNISharedPtr.hpp>
 #include <NitroModules/DefaultConstructableObject.hpp>
 
@@ -31,6 +33,8 @@ int initialize(JavaVM* vm) {
     // Register native JNI methods
     margelo::nitro::bleprintandscan::JHybridBlePrintAndScanSpec::registerNatives();
     margelo::nitro::bleprintandscan::JFunc_void_std__vector_Device__cxx::registerNatives();
+    margelo::nitro::bleprintandscan::JHybridBleScannerSpec::registerNatives();
+    margelo::nitro::bleprintandscan::JFunc_void_ScanResult_cxx::registerNatives();
 
     // Register Nitro Hybrid Objects
     HybridObjectRegistry::registerHybridObjectConstructor(
@@ -40,6 +44,15 @@ int initialize(JavaVM* vm) {
         auto instance = object.create();
         auto globalRef = jni::make_global(instance);
         return JNISharedPtr::make_shared_from_jni<JHybridBlePrintAndScanSpec>(globalRef);
+      }
+    );
+    HybridObjectRegistry::registerHybridObjectConstructor(
+      "BleScanner",
+      []() -> std::shared_ptr<HybridObject> {
+        static DefaultConstructableObject<JHybridBleScannerSpec::javaobject> object("com/bleprintandscan/HybridBleScanner");
+        auto instance = object.create();
+        auto globalRef = jni::make_global(instance);
+        return JNISharedPtr::make_shared_from_jni<JHybridBleScannerSpec>(globalRef);
       }
     );
   });

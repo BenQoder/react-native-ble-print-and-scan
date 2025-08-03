@@ -11,6 +11,7 @@
 #import <type_traits>
 
 #include "HybridBlePrintAndScanSpecSwift.hpp"
+#include "HybridBleScannerSpecSwift.hpp"
 
 @interface BlePrintAndScanAutolinking : NSObject
 @end
@@ -25,6 +26,13 @@
     "BlePrintAndScan",
     []() -> std::shared_ptr<HybridObject> {
       std::shared_ptr<margelo::nitro::bleprintandscan::HybridBlePrintAndScanSpec> hybridObject = BlePrintAndScan::BlePrintAndScanAutolinking::createBlePrintAndScan();
+      return hybridObject;
+    }
+  );
+  HybridObjectRegistry::registerHybridObjectConstructor(
+    "BleScanner",
+    []() -> std::shared_ptr<HybridObject> {
+      std::shared_ptr<margelo::nitro::bleprintandscan::HybridBleScannerSpec> hybridObject = BlePrintAndScan::BlePrintAndScanAutolinking::createBleScanner();
       return hybridObject;
     }
   );

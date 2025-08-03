@@ -10,6 +10,7 @@
 // Include C++ implementation defined types
 #include "BlePrintAndScan-Swift-Cxx-Umbrella.hpp"
 #include "HybridBlePrintAndScanSpecSwift.hpp"
+#include "HybridBleScannerSpecSwift.hpp"
 
 namespace margelo::nitro::bleprintandscan::bridge::swift {
 
@@ -74,6 +75,70 @@ namespace margelo::nitro::bleprintandscan::bridge::swift {
     }
     #endif
     BlePrintAndScan::HybridBlePrintAndScanSpec_cxx& swiftPart = swiftWrapper->getSwiftPart();
+    return swiftPart.toUnsafe();
+  }
+  
+  // pragma MARK: std::function<void(const ScannerInfo& /* result */)>
+  Func_void_ScannerInfo create_Func_void_ScannerInfo(void* _Nonnull swiftClosureWrapper) {
+    auto swiftClosure = BlePrintAndScan::Func_void_ScannerInfo::fromUnsafe(swiftClosureWrapper);
+    return [swiftClosure = std::move(swiftClosure)](const ScannerInfo& result) mutable -> void {
+      swiftClosure.call(result);
+    };
+  }
+  
+  // pragma MARK: std::function<void(const ScannerCurrentSettings& /* result */)>
+  Func_void_ScannerCurrentSettings create_Func_void_ScannerCurrentSettings(void* _Nonnull swiftClosureWrapper) {
+    auto swiftClosure = BlePrintAndScan::Func_void_ScannerCurrentSettings::fromUnsafe(swiftClosureWrapper);
+    return [swiftClosure = std::move(swiftClosure)](const ScannerCurrentSettings& result) mutable -> void {
+      swiftClosure.call(result);
+    };
+  }
+  
+  // pragma MARK: std::function<void(const ScanResult& /* result */)>
+  Func_void_ScanResult create_Func_void_ScanResult(void* _Nonnull swiftClosureWrapper) {
+    auto swiftClosure = BlePrintAndScan::Func_void_ScanResult::fromUnsafe(swiftClosureWrapper);
+    return [swiftClosure = std::move(swiftClosure)](const ScanResult& result) mutable -> void {
+      swiftClosure.call(result);
+    };
+  }
+  
+  // pragma MARK: std::function<void(double /* result */)>
+  Func_void_double create_Func_void_double(void* _Nonnull swiftClosureWrapper) {
+    auto swiftClosure = BlePrintAndScan::Func_void_double::fromUnsafe(swiftClosureWrapper);
+    return [swiftClosure = std::move(swiftClosure)](double result) mutable -> void {
+      swiftClosure.call(result);
+    };
+  }
+  
+  // pragma MARK: std::function<void(const std::vector<ScanResult>& /* result */)>
+  Func_void_std__vector_ScanResult_ create_Func_void_std__vector_ScanResult_(void* _Nonnull swiftClosureWrapper) {
+    auto swiftClosure = BlePrintAndScan::Func_void_std__vector_ScanResult_::fromUnsafe(swiftClosureWrapper);
+    return [swiftClosure = std::move(swiftClosure)](const std::vector<ScanResult>& result) mutable -> void {
+      swiftClosure.call(result);
+    };
+  }
+  
+  // pragma MARK: std::function<void(const std::string& /* result */)>
+  Func_void_std__string create_Func_void_std__string(void* _Nonnull swiftClosureWrapper) {
+    auto swiftClosure = BlePrintAndScan::Func_void_std__string::fromUnsafe(swiftClosureWrapper);
+    return [swiftClosure = std::move(swiftClosure)](const std::string& result) mutable -> void {
+      swiftClosure.call(result);
+    };
+  }
+  
+  // pragma MARK: std::shared_ptr<margelo::nitro::bleprintandscan::HybridBleScannerSpec>
+  std::shared_ptr<margelo::nitro::bleprintandscan::HybridBleScannerSpec> create_std__shared_ptr_margelo__nitro__bleprintandscan__HybridBleScannerSpec_(void* _Nonnull swiftUnsafePointer) {
+    BlePrintAndScan::HybridBleScannerSpec_cxx swiftPart = BlePrintAndScan::HybridBleScannerSpec_cxx::fromUnsafe(swiftUnsafePointer);
+    return std::make_shared<margelo::nitro::bleprintandscan::HybridBleScannerSpecSwift>(swiftPart);
+  }
+  void* _Nonnull get_std__shared_ptr_margelo__nitro__bleprintandscan__HybridBleScannerSpec_(std__shared_ptr_margelo__nitro__bleprintandscan__HybridBleScannerSpec_ cppType) {
+    std::shared_ptr<margelo::nitro::bleprintandscan::HybridBleScannerSpecSwift> swiftWrapper = std::dynamic_pointer_cast<margelo::nitro::bleprintandscan::HybridBleScannerSpecSwift>(cppType);
+    #ifdef NITRO_DEBUG
+    if (swiftWrapper == nullptr) [[unlikely]] {
+      throw std::runtime_error("Class \"HybridBleScannerSpec\" is not implemented in Swift!");
+    }
+    #endif
+    BlePrintAndScan::HybridBleScannerSpec_cxx& swiftPart = swiftWrapper->getSwiftPart();
     return swiftPart.toUnsafe();
   }
 

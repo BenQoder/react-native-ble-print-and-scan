@@ -28,8 +28,10 @@ target_sources(
   ../nitrogen/generated/android/BlePrintAndScanOnLoad.cpp
   # Shared Nitrogen C++ sources
   ../nitrogen/generated/shared/c++/HybridBlePrintAndScanSpec.cpp
+  ../nitrogen/generated/shared/c++/HybridBleScannerSpec.cpp
   # Android-specific Nitrogen C++ sources
   ../nitrogen/generated/android/c++/JHybridBlePrintAndScanSpec.cpp
+  ../nitrogen/generated/android/c++/JHybridBleScannerSpec.cpp
 )
 
 # Define a flag to check if we are building properly
