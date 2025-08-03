@@ -107,9 +107,16 @@ class BluetoothManager(private val context: Context) {
                 { scanResult ->
                     val deviceName = scanResult.bleDevice.name
                     val deviceId = scanResult.bleDevice.macAddress
-                    if (!deviceName.isNullOrBlank() && !devices.containsKey(deviceId)) {
-                        devices[deviceId] = deviceName
-                        devicesFound.add(mapOf("id" to deviceId, "name" to deviceName))
+                    
+                    // Filter out devices with invalid names
+                    if (!deviceName.isNullOrBlank() && 
+                        deviceName.trim().isNotEmpty() && 
+                        !deviceName.startsWith("Unknown") &&
+                        !deviceName.matches(Regex("^[0-9A-F:]{17}$")) && // Not just MAC address
+                        !devices.containsKey(deviceId)) {
+                        
+                        devices[deviceId] = deviceName.trim()
+                        devicesFound.add(mapOf("id" to deviceId, "name" to deviceName.trim()))
                         onDeviceFound(devicesFound.toTypedArray())
                     }
                 },
@@ -237,15 +244,77 @@ class BluetoothManager(private val context: Context) {
     }
     
     fun isConnected(deviceId: String): Boolean {
-        return connections[deviceId]?.isConnected ?: false
+        val connectionInfo = connections[deviceId] ?: return false
+        
+        try {
+            val actualState = connectionInfo.device.connectionState
+            val isActuallyConnected = actualState == com.polidea.rxandroidble3.RxBleConnection.RxBleConnectionState.CONNECTED
+            
+            // If our internal state doesn't match actual state, clean up
+            if (connectionInfo.isConnected && !isActuallyConnected) {
+                Log.d("BluetoothManager", "Cleaning up stale connection for device: $deviceId")
+                connections.remove(deviceId)
+                deviceDisposables[deviceId]?.clear()
+                deviceDisposables.remove(deviceId)
+                return false
+            }
+            
+            return connectionInfo.isConnected && isActuallyConnected
+        } catch (e: Exception) {
+            Log.e("BluetoothManager", "Error checking connection state for device: $deviceId")
+            // Clean up problematic connection
+            connections.remove(deviceId)
+            deviceDisposables[deviceId]?.clear()
+            deviceDisposables.remove(deviceId)
+            return false
+        }
     }
     
     fun getConnectedDevices(): List<Map<String, String>> {
-        return connections.filter { it.value.isConnected }.map { (deviceId, connectionInfo) ->
-            mapOf(
-                "id" to deviceId,
-                "name" to (devices[deviceId] ?: "Unknown Device")
-            )
+        // Clean up stale connections first
+        val staleConnections = mutableListOf<String>()
+        
+        connections.forEach { (deviceId, connectionInfo) ->
+            try {
+                val actualState = connectionInfo.device.connectionState
+                val isActuallyConnected = actualState == com.polidea.rxandroidble3.RxBleConnection.RxBleConnectionState.CONNECTED
+                
+                if (connectionInfo.isConnected && !isActuallyConnected) {
+                    // Mark as stale - device shows connected but isn't actually connected
+                    staleConnections.add(deviceId)
+                    Log.d("BluetoothManager", "Found stale connection for device: $deviceId, actual state: $actualState")
+                }
+            } catch (e: Exception) {
+                // If we can't check the state, consider it stale
+                staleConnections.add(deviceId)
+                Log.d("BluetoothManager", "Error checking connection state for device: $deviceId, removing")
+            }
+        }
+        
+        // Remove stale connections
+        staleConnections.forEach { deviceId ->
+            connections.remove(deviceId)
+            deviceDisposables[deviceId]?.clear()
+            deviceDisposables.remove(deviceId)
+        }
+        
+        return connections.filter { it.value.isConnected }.mapNotNull { (deviceId, connectionInfo) ->
+            try {
+                val actualState = connectionInfo.device.connectionState
+                val isActuallyConnected = actualState == com.polidea.rxandroidble3.RxBleConnection.RxBleConnectionState.CONNECTED
+                
+                if (isActuallyConnected) {
+                    mapOf(
+                        "id" to deviceId,
+                        "name" to (devices[deviceId] ?: connectionInfo.device.name ?: "Unknown Device")
+                    )
+                } else {
+                    null
+                }
+            } catch (e: Exception) {
+                Log.e("BluetoothManager", "Error validating connection for device: $deviceId")
+                null
+            }
         }
     }
 

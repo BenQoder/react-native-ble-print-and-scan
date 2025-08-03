@@ -174,11 +174,22 @@ class ScannerBluetoothManager(private val context: Context) {
     }
     
     private fun notifyScannersFound() {
-        val devices = discoveredDevices.map { device ->
-            mapOf(
-                "id" to device.address,
-                "name" to (device.name ?: "Unknown Scanner")
-            )
+        val devices = discoveredDevices.mapNotNull { device ->
+            val deviceName = device.name
+            
+            // Filter out devices with invalid names
+            if (!deviceName.isNullOrBlank() && 
+                deviceName.trim().isNotEmpty() && 
+                !deviceName.startsWith("Unknown") &&
+                !deviceName.matches(Regex("^[0-9A-F:]{17}$"))) { // Not just MAC address
+                
+                mapOf(
+                    "id" to device.address,
+                    "name" to deviceName.trim()
+                )
+            } else {
+                null
+            }
         }
         onScannerFound?.invoke(devices)
     }
@@ -276,15 +287,71 @@ class ScannerBluetoothManager(private val context: Context) {
     }
     
     fun isConnected(deviceId: String): Boolean {
-        return scannerConnections[deviceId]?.isConnected ?: false
+        val connectionInfo = scannerConnections[deviceId] ?: return false
+        
+        try {
+            // For Classic Bluetooth, check if socket is still connected
+            val socket = connectionInfo.socket
+            if (connectionInfo.isConnected && (socket == null || !socket.isConnected)) {
+                Log.d(TAG, "Cleaning up stale scanner connection for device: $deviceId")
+                scannerConnections.remove(deviceId)
+                dataCallbacks.remove(deviceId)
+                return false
+            }
+            
+            return connectionInfo.isConnected && socket?.isConnected == true
+        } catch (e: Exception) {
+            Log.e(TAG, "Error checking scanner connection state for device: $deviceId")
+            // Clean up problematic connection
+            scannerConnections.remove(deviceId)
+            dataCallbacks.remove(deviceId)
+            return false
+        }
     }
     
     fun getConnectedScanners(): List<Map<String, String>> {
-        return scannerConnections.filter { it.value.isConnected }.map { (deviceId, connectionInfo) ->
-            mapOf(
-                "id" to deviceId,
-                "name" to (connectionInfo.device.name ?: "Unknown Scanner")
-            )
+        // Clean up stale connections first
+        val staleConnections = mutableListOf<String>()
+        
+        scannerConnections.forEach { (deviceId, connectionInfo) ->
+            try {
+                val socket = connectionInfo.socket
+                if (connectionInfo.isConnected && (socket == null || !socket.isConnected)) {
+                    staleConnections.add(deviceId)
+                    Log.d(TAG, "Found stale scanner connection for device: $deviceId")
+                }
+            } catch (e: Exception) {
+                staleConnections.add(deviceId)
+                Log.d(TAG, "Error checking scanner connection state for device: $deviceId, removing")
+            }
+        }
+        
+        // Remove stale connections
+        staleConnections.forEach { deviceId ->
+            scannerConnections.remove(deviceId)
+            dataCallbacks.remove(deviceId)
+        }
+        
+        return scannerConnections.filter { it.value.isConnected }.mapNotNull { (deviceId, connectionInfo) ->
+            try {
+                val socket = connectionInfo.socket
+                if (socket?.isConnected == true) {
+                    val deviceName = connectionInfo.device.name
+                    if (!deviceName.isNullOrBlank() && deviceName.trim().isNotEmpty()) {
+                        mapOf(
+                            "id" to deviceId,
+                            "name" to deviceName.trim()
+                        )
+                    } else {
+                        null
+                    }
+                } else {
+                    null
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error validating scanner connection for device: $deviceId")
+                null
+            }
         }
     }
     
