@@ -1,30 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, TouchableOpacity, ScrollView, Alert, View, Text } from 'react-native';
-import { BleScanner, type ScanResult, type ScannerInfo, ScannerMode, BeepVolume, BeepTone, ScannerTrigger } from "react-native-ble-print-and-scan";
+import { BleScanner, type ScanResult, ScannerMode, BeepVolume, BeepTone, ScannerTrigger } from "react-native-ble-print-and-scan";
 import { useLocalSearchParams, router } from 'expo-router';
 
 export default function ScannerScreen() {
   const { deviceId, deviceName } = useLocalSearchParams<{ deviceId: string; deviceName: string }>();
   const [scanResults, setScanResults] = useState<ScanResult[]>([]);
   const [isListening, setIsListening] = useState(false);
-  const [scannerInfo, setScannerInfo] = useState<ScannerInfo | null>(null);
-
-  useEffect(() => {
-    if (deviceId) {
-      loadScannerInfo();
-    }
-  }, [deviceId]);
-
-  const loadScannerInfo = async () => {
-    if (!deviceId) return;
-
-    try {
-      const info = await BleScanner.getScannerInfo(deviceId);
-      setScannerInfo(info);
-    } catch (error) {
-      console.error('Failed to get scanner info:', error);
-    }
-  };
 
   const startListening = async () => {
     if (!deviceId) {
@@ -103,15 +85,6 @@ export default function ScannerScreen() {
       </View>
 
       <View style={styles.content}>
-        {scannerInfo && (
-          <View style={styles.scannerInfoContainer}>
-            <Text style={styles.infoText}>Firmware: {scannerInfo.firmwareVersion}</Text>
-            <Text style={styles.infoText}>Module: {scannerInfo.moduleType}</Text>
-            {scannerInfo.batteryLevel && (
-              <Text style={styles.infoText}>Battery: {scannerInfo.batteryLevel}%</Text>
-            )}
-          </View>
-        )}
 
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button} onPress={configureScanner}>
@@ -194,17 +167,6 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 20,
-  },
-  scannerInfoContainer: {
-    backgroundColor: '#f8f9fa',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 20,
-  },
-  infoText: {
-    fontSize: 14,
-    marginBottom: 5,
-    color: '#333',
   },
   buttonContainer: {
     marginBottom: 20,

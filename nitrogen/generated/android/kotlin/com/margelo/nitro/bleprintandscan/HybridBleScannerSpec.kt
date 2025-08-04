@@ -77,14 +77,6 @@ abstract class HybridBleScannerSpec: HybridObject() {
   @Keep
   abstract fun disconnectAllScanners(): Promise<Unit>
   
-  @DoNotStrip
-  @Keep
-  abstract fun getScannerInfo(deviceId: String): Promise<ScannerInfo>
-  
-  @DoNotStrip
-  @Keep
-  abstract fun getScannerSettings(deviceId: String): Promise<ScannerCurrentSettings>
-  
   abstract fun startListening(deviceId: String, onScanResult: (result: ScanResult) -> Unit): Promise<Unit>
   
   @DoNotStrip

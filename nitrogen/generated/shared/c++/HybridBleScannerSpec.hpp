@@ -15,10 +15,6 @@
 
 // Forward declaration of `Device` to properly resolve imports.
 namespace margelo::nitro::bleprintandscan { struct Device; }
-// Forward declaration of `ScannerInfo` to properly resolve imports.
-namespace margelo::nitro::bleprintandscan { struct ScannerInfo; }
-// Forward declaration of `ScannerCurrentSettings` to properly resolve imports.
-namespace margelo::nitro::bleprintandscan { struct ScannerCurrentSettings; }
 // Forward declaration of `ScanResult` to properly resolve imports.
 namespace margelo::nitro::bleprintandscan { struct ScanResult; }
 // Forward declaration of `ScannerTrigger` to properly resolve imports.
@@ -39,8 +35,6 @@ namespace margelo::nitro::bleprintandscan { enum class TimestampFormat; }
 #include <vector>
 #include <functional>
 #include <string>
-#include "ScannerInfo.hpp"
-#include "ScannerCurrentSettings.hpp"
 #include "ScanResult.hpp"
 #include "ScannerTrigger.hpp"
 #include "ScannerMode.hpp"
@@ -89,8 +83,6 @@ namespace margelo::nitro::bleprintandscan {
       virtual std::shared_ptr<Promise<bool>> isScannerConnected(const std::string& deviceId) = 0;
       virtual std::shared_ptr<Promise<std::vector<Device>>> getConnectedScanners() = 0;
       virtual std::shared_ptr<Promise<void>> disconnectAllScanners() = 0;
-      virtual std::shared_ptr<Promise<ScannerInfo>> getScannerInfo(const std::string& deviceId) = 0;
-      virtual std::shared_ptr<Promise<ScannerCurrentSettings>> getScannerSettings(const std::string& deviceId) = 0;
       virtual std::shared_ptr<Promise<void>> startListening(const std::string& deviceId, const std::function<void(const ScanResult& /* result */)>& onScanResult) = 0;
       virtual std::shared_ptr<Promise<void>> stopListening(const std::string& deviceId) = 0;
       virtual std::shared_ptr<Promise<void>> triggerScan(const std::string& deviceId, ScannerTrigger duration) = 0;

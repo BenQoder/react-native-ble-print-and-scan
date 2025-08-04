@@ -279,44 +279,6 @@ open class HybridBleScannerSpec_cxx {
   }
   
   @inline(__always)
-  public final func getScannerInfo(deviceId: std.string) -> bridge.Result_std__shared_ptr_Promise_ScannerInfo___ {
-    do {
-      let __result = try self.__implementation.getScannerInfo(deviceId: String(deviceId))
-      let __resultCpp = { () -> bridge.std__shared_ptr_Promise_ScannerInfo__ in
-        let __promise = bridge.create_std__shared_ptr_Promise_ScannerInfo__()
-        let __promiseHolder = bridge.wrap_std__shared_ptr_Promise_ScannerInfo__(__promise)
-        __result
-          .then({ __result in __promiseHolder.resolve(__result) })
-          .catch({ __error in __promiseHolder.reject(__error.toCpp()) })
-        return __promise
-      }()
-      return bridge.create_Result_std__shared_ptr_Promise_ScannerInfo___(__resultCpp)
-    } catch (let __error) {
-      let __exceptionPtr = __error.toCpp()
-      return bridge.create_Result_std__shared_ptr_Promise_ScannerInfo___(__exceptionPtr)
-    }
-  }
-  
-  @inline(__always)
-  public final func getScannerSettings(deviceId: std.string) -> bridge.Result_std__shared_ptr_Promise_ScannerCurrentSettings___ {
-    do {
-      let __result = try self.__implementation.getScannerSettings(deviceId: String(deviceId))
-      let __resultCpp = { () -> bridge.std__shared_ptr_Promise_ScannerCurrentSettings__ in
-        let __promise = bridge.create_std__shared_ptr_Promise_ScannerCurrentSettings__()
-        let __promiseHolder = bridge.wrap_std__shared_ptr_Promise_ScannerCurrentSettings__(__promise)
-        __result
-          .then({ __result in __promiseHolder.resolve(__result) })
-          .catch({ __error in __promiseHolder.reject(__error.toCpp()) })
-        return __promise
-      }()
-      return bridge.create_Result_std__shared_ptr_Promise_ScannerCurrentSettings___(__resultCpp)
-    } catch (let __error) {
-      let __exceptionPtr = __error.toCpp()
-      return bridge.create_Result_std__shared_ptr_Promise_ScannerCurrentSettings___(__exceptionPtr)
-    }
-  }
-  
-  @inline(__always)
   public final func startListening(deviceId: std.string, onScanResult: bridge.Func_void_ScanResult) -> bridge.Result_std__shared_ptr_Promise_void___ {
     do {
       let __result = try self.__implementation.startListening(deviceId: String(deviceId), onScanResult: { () -> (ScanResult) -> Void in

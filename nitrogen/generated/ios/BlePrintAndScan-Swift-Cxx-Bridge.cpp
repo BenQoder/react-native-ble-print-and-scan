@@ -78,22 +78,6 @@ namespace margelo::nitro::bleprintandscan::bridge::swift {
     return swiftPart.toUnsafe();
   }
   
-  // pragma MARK: std::function<void(const ScannerInfo& /* result */)>
-  Func_void_ScannerInfo create_Func_void_ScannerInfo(void* _Nonnull swiftClosureWrapper) {
-    auto swiftClosure = BlePrintAndScan::Func_void_ScannerInfo::fromUnsafe(swiftClosureWrapper);
-    return [swiftClosure = std::move(swiftClosure)](const ScannerInfo& result) mutable -> void {
-      swiftClosure.call(result);
-    };
-  }
-  
-  // pragma MARK: std::function<void(const ScannerCurrentSettings& /* result */)>
-  Func_void_ScannerCurrentSettings create_Func_void_ScannerCurrentSettings(void* _Nonnull swiftClosureWrapper) {
-    auto swiftClosure = BlePrintAndScan::Func_void_ScannerCurrentSettings::fromUnsafe(swiftClosureWrapper);
-    return [swiftClosure = std::move(swiftClosure)](const ScannerCurrentSettings& result) mutable -> void {
-      swiftClosure.call(result);
-    };
-  }
-  
   // pragma MARK: std::function<void(const ScanResult& /* result */)>
   Func_void_ScanResult create_Func_void_ScanResult(void* _Nonnull swiftClosureWrapper) {
     auto swiftClosure = BlePrintAndScan::Func_void_ScanResult::fromUnsafe(swiftClosureWrapper);

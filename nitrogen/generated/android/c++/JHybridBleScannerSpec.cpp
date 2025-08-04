@@ -9,10 +9,10 @@
 
 // Forward declaration of `Device` to properly resolve imports.
 namespace margelo::nitro::bleprintandscan { struct Device; }
-// Forward declaration of `ScannerInfo` to properly resolve imports.
-namespace margelo::nitro::bleprintandscan { struct ScannerInfo; }
-// Forward declaration of `ScannerCurrentSettings` to properly resolve imports.
-namespace margelo::nitro::bleprintandscan { struct ScannerCurrentSettings; }
+// Forward declaration of `ScanResult` to properly resolve imports.
+namespace margelo::nitro::bleprintandscan { struct ScanResult; }
+// Forward declaration of `ScannerTrigger` to properly resolve imports.
+namespace margelo::nitro::bleprintandscan { enum class ScannerTrigger; }
 // Forward declaration of `ScannerMode` to properly resolve imports.
 namespace margelo::nitro::bleprintandscan { enum class ScannerMode; }
 // Forward declaration of `BeepSettings` to properly resolve imports.
@@ -25,10 +25,6 @@ namespace margelo::nitro::bleprintandscan { enum class BeepTone; }
 namespace margelo::nitro::bleprintandscan { struct PowerSettings; }
 // Forward declaration of `DataFormatSettings` to properly resolve imports.
 namespace margelo::nitro::bleprintandscan { struct DataFormatSettings; }
-// Forward declaration of `ScanResult` to properly resolve imports.
-namespace margelo::nitro::bleprintandscan { struct ScanResult; }
-// Forward declaration of `ScannerTrigger` to properly resolve imports.
-namespace margelo::nitro::bleprintandscan { enum class ScannerTrigger; }
 // Forward declaration of `TimestampFormat` to properly resolve imports.
 namespace margelo::nitro::bleprintandscan { enum class TimestampFormat; }
 
@@ -38,11 +34,13 @@ namespace margelo::nitro::bleprintandscan { enum class TimestampFormat; }
 #include <vector>
 #include "JDevice.hpp"
 #include <string>
-#include "ScannerInfo.hpp"
-#include "JScannerInfo.hpp"
-#include <optional>
-#include "ScannerCurrentSettings.hpp"
-#include "JScannerCurrentSettings.hpp"
+#include "ScanResult.hpp"
+#include "JScanResult.hpp"
+#include <functional>
+#include "JFunc_void_std__vector_Device_.hpp"
+#include "JFunc_void_ScanResult.hpp"
+#include "ScannerTrigger.hpp"
+#include "JScannerTrigger.hpp"
 #include "ScannerMode.hpp"
 #include "JScannerMode.hpp"
 #include "BeepSettings.hpp"
@@ -51,17 +49,11 @@ namespace margelo::nitro::bleprintandscan { enum class TimestampFormat; }
 #include "JBeepVolume.hpp"
 #include "BeepTone.hpp"
 #include "JBeepTone.hpp"
+#include <optional>
 #include "PowerSettings.hpp"
 #include "JPowerSettings.hpp"
 #include "DataFormatSettings.hpp"
 #include "JDataFormatSettings.hpp"
-#include "ScanResult.hpp"
-#include "JScanResult.hpp"
-#include <functional>
-#include "JFunc_void_std__vector_Device_.hpp"
-#include "JFunc_void_ScanResult.hpp"
-#include "ScannerTrigger.hpp"
-#include "JScannerTrigger.hpp"
 #include "TimestampFormat.hpp"
 #include "JTimestampFormat.hpp"
 
@@ -214,38 +206,6 @@ namespace margelo::nitro::bleprintandscan {
       auto __promise = Promise<void>::create();
       __result->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>& /* unit */) {
         __promise->resolve();
-      });
-      __result->cthis()->addOnRejectedListener([=](const jni::alias_ref<jni::JThrowable>& __throwable) {
-        jni::JniException __jniError(__throwable);
-        __promise->reject(std::make_exception_ptr(__jniError));
-      });
-      return __promise;
-    }();
-  }
-  std::shared_ptr<Promise<ScannerInfo>> JHybridBleScannerSpec::getScannerInfo(const std::string& deviceId) {
-    static const auto method = javaClassStatic()->getMethod<jni::local_ref<JPromise::javaobject>(jni::alias_ref<jni::JString> /* deviceId */)>("getScannerInfo");
-    auto __result = method(_javaPart, jni::make_jstring(deviceId));
-    return [&]() {
-      auto __promise = Promise<ScannerInfo>::create();
-      __result->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>& __boxedResult) {
-        auto __result = jni::static_ref_cast<JScannerInfo>(__boxedResult);
-        __promise->resolve(__result->toCpp());
-      });
-      __result->cthis()->addOnRejectedListener([=](const jni::alias_ref<jni::JThrowable>& __throwable) {
-        jni::JniException __jniError(__throwable);
-        __promise->reject(std::make_exception_ptr(__jniError));
-      });
-      return __promise;
-    }();
-  }
-  std::shared_ptr<Promise<ScannerCurrentSettings>> JHybridBleScannerSpec::getScannerSettings(const std::string& deviceId) {
-    static const auto method = javaClassStatic()->getMethod<jni::local_ref<JPromise::javaobject>(jni::alias_ref<jni::JString> /* deviceId */)>("getScannerSettings");
-    auto __result = method(_javaPart, jni::make_jstring(deviceId));
-    return [&]() {
-      auto __promise = Promise<ScannerCurrentSettings>::create();
-      __result->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>& __boxedResult) {
-        auto __result = jni::static_ref_cast<JScannerCurrentSettings>(__boxedResult);
-        __promise->resolve(__result->toCpp());
       });
       __result->cthis()->addOnRejectedListener([=](const jni::alias_ref<jni::JThrowable>& __throwable) {
         jni::JniException __jniError(__throwable);

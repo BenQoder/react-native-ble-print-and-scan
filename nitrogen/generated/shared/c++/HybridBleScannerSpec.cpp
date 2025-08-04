@@ -22,8 +22,6 @@ namespace margelo::nitro::bleprintandscan {
       prototype.registerHybridMethod("isScannerConnected", &HybridBleScannerSpec::isScannerConnected);
       prototype.registerHybridMethod("getConnectedScanners", &HybridBleScannerSpec::getConnectedScanners);
       prototype.registerHybridMethod("disconnectAllScanners", &HybridBleScannerSpec::disconnectAllScanners);
-      prototype.registerHybridMethod("getScannerInfo", &HybridBleScannerSpec::getScannerInfo);
-      prototype.registerHybridMethod("getScannerSettings", &HybridBleScannerSpec::getScannerSettings);
       prototype.registerHybridMethod("startListening", &HybridBleScannerSpec::startListening);
       prototype.registerHybridMethod("stopListening", &HybridBleScannerSpec::stopListening);
       prototype.registerHybridMethod("triggerScan", &HybridBleScannerSpec::triggerScan);

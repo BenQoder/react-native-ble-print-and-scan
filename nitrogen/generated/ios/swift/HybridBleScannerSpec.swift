@@ -22,8 +22,6 @@ public protocol HybridBleScannerSpec_protocol: HybridObject {
   func isScannerConnected(deviceId: String) throws -> Promise<Bool>
   func getConnectedScanners() throws -> Promise<[Device]>
   func disconnectAllScanners() throws -> Promise<Void>
-  func getScannerInfo(deviceId: String) throws -> Promise<ScannerInfo>
-  func getScannerSettings(deviceId: String) throws -> Promise<ScannerCurrentSettings>
   func startListening(deviceId: String, onScanResult: @escaping (_ result: ScanResult) -> Void) throws -> Promise<Void>
   func stopListening(deviceId: String) throws -> Promise<Void>
   func triggerScan(deviceId: String, duration: ScannerTrigger) throws -> Promise<Void>

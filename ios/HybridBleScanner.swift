@@ -117,57 +117,6 @@ class HybridBleScanner: HybridBleScannerSpec {
         }
     }
     
-    // MARK: - Scanner Information
-    
-    func getScannerInfo(deviceId: String) throws -> Promise<ScannerInfo> {
-        return Promise.async {
-            guard let manager = self.scannerManager else {
-                throw NSError(domain: "ScannerBluetoothError", code: 2, userInfo: [NSLocalizedDescriptionKey: "ScannerBluetoothManager not initialized"])
-            }
-            
-            // Get firmware version
-            let firmwareVersion = try await manager.sendCommand(deviceId: deviceId, command: "$SW#VER")
-            
-            return ScannerInfo(
-                firmwareVersion: firmwareVersion,
-                moduleType: "Unknown", // Could be retrieved with additional commands
-                batteryLevel: nil, // Could be retrieved with "%BAT_VOL#"
-                isConnected: manager.isConnected(deviceId: deviceId)
-            )
-        }
-    }
-    
-    func getScannerSettings(deviceId: String) throws -> Promise<ScannerCurrentSettings> {
-        return Promise.async {
-            guard let manager = self.scannerManager else {
-                throw NSError(domain: "ScannerBluetoothError", code: 2, userInfo: [NSLocalizedDescriptionKey: "ScannerBluetoothManager not initialized"])
-            }
-            
-            // This would require multiple commands to get all settings
-            // For now, return default settings
-            return ScannerCurrentSettings(
-                workMode: ScannerMode.hostTrigger,
-                beepSettings: BeepSettings(
-                    volume: BeepVolume.middle,
-                    tone: BeepTone.highTone,
-                    enabled: true,
-                    customLevel: nil
-                ),
-                powerSettings: PowerSettings(
-                    sleepTimeMinutes: 0,
-                    autoSleepEnabled: false
-                ),
-                dataFormatSettings: DataFormatSettings(
-                    prefixEnabled: false,
-                    suffixEnabled: false,
-                    hideBarcodePrefix: false,
-                    hideBarcodeContent: false,
-                    hideBarcodeSuffix: false
-                ),
-                timestampEnabled: false
-            )
-        }
-    }
     
     // MARK: - Scan Operations
     

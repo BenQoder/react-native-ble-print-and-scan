@@ -14,10 +14,10 @@ namespace BlePrintAndScan { class HybridBleScannerSpec_cxx; }
 
 // Forward declaration of `Device` to properly resolve imports.
 namespace margelo::nitro::bleprintandscan { struct Device; }
-// Forward declaration of `ScannerInfo` to properly resolve imports.
-namespace margelo::nitro::bleprintandscan { struct ScannerInfo; }
-// Forward declaration of `ScannerCurrentSettings` to properly resolve imports.
-namespace margelo::nitro::bleprintandscan { struct ScannerCurrentSettings; }
+// Forward declaration of `ScanResult` to properly resolve imports.
+namespace margelo::nitro::bleprintandscan { struct ScanResult; }
+// Forward declaration of `ScannerTrigger` to properly resolve imports.
+namespace margelo::nitro::bleprintandscan { enum class ScannerTrigger; }
 // Forward declaration of `ScannerMode` to properly resolve imports.
 namespace margelo::nitro::bleprintandscan { enum class ScannerMode; }
 // Forward declaration of `BeepSettings` to properly resolve imports.
@@ -30,10 +30,6 @@ namespace margelo::nitro::bleprintandscan { enum class BeepTone; }
 namespace margelo::nitro::bleprintandscan { struct PowerSettings; }
 // Forward declaration of `DataFormatSettings` to properly resolve imports.
 namespace margelo::nitro::bleprintandscan { struct DataFormatSettings; }
-// Forward declaration of `ScanResult` to properly resolve imports.
-namespace margelo::nitro::bleprintandscan { struct ScanResult; }
-// Forward declaration of `ScannerTrigger` to properly resolve imports.
-namespace margelo::nitro::bleprintandscan { enum class ScannerTrigger; }
 // Forward declaration of `TimestampFormat` to properly resolve imports.
 namespace margelo::nitro::bleprintandscan { enum class TimestampFormat; }
 
@@ -42,17 +38,15 @@ namespace margelo::nitro::bleprintandscan { enum class TimestampFormat; }
 #include <vector>
 #include <functional>
 #include <string>
-#include "ScannerInfo.hpp"
-#include <optional>
-#include "ScannerCurrentSettings.hpp"
+#include "ScanResult.hpp"
+#include "ScannerTrigger.hpp"
 #include "ScannerMode.hpp"
 #include "BeepSettings.hpp"
 #include "BeepVolume.hpp"
 #include "BeepTone.hpp"
+#include <optional>
 #include "PowerSettings.hpp"
 #include "DataFormatSettings.hpp"
-#include "ScanResult.hpp"
-#include "ScannerTrigger.hpp"
 #include "TimestampFormat.hpp"
 
 #include "BlePrintAndScan-Swift-Cxx-Umbrella.hpp"
@@ -154,22 +148,6 @@ namespace margelo::nitro::bleprintandscan {
     }
     inline std::shared_ptr<Promise<void>> disconnectAllScanners() override {
       auto __result = _swiftPart.disconnectAllScanners();
-      if (__result.hasError()) [[unlikely]] {
-        std::rethrow_exception(__result.error());
-      }
-      auto __value = std::move(__result.value());
-      return __value;
-    }
-    inline std::shared_ptr<Promise<ScannerInfo>> getScannerInfo(const std::string& deviceId) override {
-      auto __result = _swiftPart.getScannerInfo(deviceId);
-      if (__result.hasError()) [[unlikely]] {
-        std::rethrow_exception(__result.error());
-      }
-      auto __value = std::move(__result.value());
-      return __value;
-    }
-    inline std::shared_ptr<Promise<ScannerCurrentSettings>> getScannerSettings(const std::string& deviceId) override {
-      auto __result = _swiftPart.getScannerSettings(deviceId);
       if (__result.hasError()) [[unlikely]] {
         std::rethrow_exception(__result.error());
       }

@@ -60,8 +60,6 @@ namespace margelo::nitro::bleprintandscan {
     std::shared_ptr<Promise<bool>> isScannerConnected(const std::string& deviceId) override;
     std::shared_ptr<Promise<std::vector<Device>>> getConnectedScanners() override;
     std::shared_ptr<Promise<void>> disconnectAllScanners() override;
-    std::shared_ptr<Promise<ScannerInfo>> getScannerInfo(const std::string& deviceId) override;
-    std::shared_ptr<Promise<ScannerCurrentSettings>> getScannerSettings(const std::string& deviceId) override;
     std::shared_ptr<Promise<void>> startListening(const std::string& deviceId, const std::function<void(const ScanResult& /* result */)>& onScanResult) override;
     std::shared_ptr<Promise<void>> stopListening(const std::string& deviceId) override;
     std::shared_ptr<Promise<void>> triggerScan(const std::string& deviceId, ScannerTrigger duration) override;

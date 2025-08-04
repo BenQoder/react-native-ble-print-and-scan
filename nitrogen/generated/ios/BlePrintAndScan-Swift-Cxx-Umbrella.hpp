@@ -28,10 +28,6 @@ namespace margelo::nitro::bleprintandscan { class HybridBleScannerSpec; }
 namespace margelo::nitro::bleprintandscan { struct PowerSettings; }
 // Forward declaration of `ScanResult` to properly resolve imports.
 namespace margelo::nitro::bleprintandscan { struct ScanResult; }
-// Forward declaration of `ScannerCurrentSettings` to properly resolve imports.
-namespace margelo::nitro::bleprintandscan { struct ScannerCurrentSettings; }
-// Forward declaration of `ScannerInfo` to properly resolve imports.
-namespace margelo::nitro::bleprintandscan { struct ScannerInfo; }
 // Forward declaration of `ScannerMode` to properly resolve imports.
 namespace margelo::nitro::bleprintandscan { enum class ScannerMode; }
 // Forward declaration of `ScannerTrigger` to properly resolve imports.
@@ -49,8 +45,6 @@ namespace margelo::nitro::bleprintandscan { enum class TimestampFormat; }
 #include "HybridBleScannerSpec.hpp"
 #include "PowerSettings.hpp"
 #include "ScanResult.hpp"
-#include "ScannerCurrentSettings.hpp"
-#include "ScannerInfo.hpp"
 #include "ScannerMode.hpp"
 #include "ScannerTrigger.hpp"
 #include "TimestampFormat.hpp"

@@ -1,9 +1,10 @@
-package com.bleprintandscan
+package com.margelo.nitro.bleprintandscan
 
 import android.app.Activity
 import com.margelo.nitro.bleprintandscan.*
 import com.margelo.nitro.core.Promise
 import com.margelo.nitro.NitroModules
+import com.bleprintandscan.ScannerBluetoothManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

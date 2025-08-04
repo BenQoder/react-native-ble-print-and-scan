@@ -8,20 +8,6 @@ export interface ScanResult {
   deviceName: string
 }
 
-export interface ScannerInfo {
-  firmwareVersion: string
-  moduleType: string
-  batteryLevel?: number
-  isConnected: boolean
-}
-
-export interface ScannerCurrentSettings {
-  workMode: ScannerMode
-  beepSettings: BeepSettings
-  powerSettings: PowerSettings
-  dataFormatSettings: DataFormatSettings
-  timestampEnabled: boolean
-}
 
 export enum ScannerMode {
   KEY_HOLD = 0,           // Button hold scan mode
@@ -91,9 +77,6 @@ export interface BleScanner extends HybridObject<{ android: 'kotlin', ios: 'swif
   getConnectedScanners(): Promise<Device[]>
   disconnectAllScanners(): Promise<void>
   
-  // Scanner information
-  getScannerInfo(deviceId: string): Promise<ScannerInfo>
-  getScannerSettings(deviceId: string): Promise<ScannerCurrentSettings>
   
   // Scan operations
   startListening(deviceId: string, onScanResult: (result: ScanResult) => void): Promise<void>

@@ -49,6 +49,10 @@ class ScannerBluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralD
     // Data reception callbacks per device
     private var dataCallbacks: [String: (ScanResult) -> Void] = [:]
     
+    // State initialization tracking
+    private var stateInitialized = false
+    private var initializationCallbacks: [(Bool) -> Void] = []
+    
     // Command response callbacks
     private var commandCallbacks: [String: (Result<String, Error>) -> Void] = [:]
     
@@ -65,7 +69,40 @@ class ScannerBluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralD
     // MARK: - Public Interface
     
     func requestBluetoothPermissions() -> Bool {
-        return centralManager.state == .poweredOn
+        // Check authorization status first
+        if #available(iOS 13.0, *) {
+            guard CBManager.authorization == .allowedAlways else {
+                return false
+            }
+        } else {
+            guard CBPeripheralManager.authorizationStatus() == .authorized else {
+                return false
+            }
+        }
+        
+        // If state is already determined, return immediately
+        if stateInitialized {
+            return centralManager.state == .poweredOn
+        }
+        
+        // For first-time initialization, wait for state to be determined
+        let semaphore = DispatchSemaphore(value: 0)
+        var permissionResult = false
+        
+        initializationCallbacks.append { [weak self] success in
+            guard let self = self else {
+                permissionResult = false
+                semaphore.signal()
+                return
+            }
+            permissionResult = success && (self.centralManager.state == .poweredOn)
+            semaphore.signal()
+        }
+        
+        // Wait maximum 2 seconds for state update
+        _ = semaphore.wait(timeout: .now() + 2.0)
+        
+        return permissionResult
     }
     
     func isBluetoothSupported() -> Bool {
@@ -270,21 +307,39 @@ class ScannerBluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralD
     // MARK: - CBCentralManagerDelegate
     
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        let success: Bool
+        
         switch central.state {
         case .poweredOff:
             print("Scanner Bluetooth powered off")
+            success = false
         case .poweredOn:
             print("Scanner Bluetooth powered on")
+            success = true
         case .resetting:
             print("Scanner Bluetooth resetting")
+            success = false
         case .unauthorized:
             print("Scanner Bluetooth unauthorized")
+            success = false
         case .unknown:
             print("Scanner Bluetooth unknown state")
+            success = false
         case .unsupported:
             print("Scanner Bluetooth unsupported")
+            success = false
         @unknown default:
             print("Scanner Bluetooth unknown state")
+            success = false
+        }
+        
+        // Mark as initialized and notify callbacks
+        if !stateInitialized {
+            stateInitialized = true
+            for callback in initializationCallbacks {
+                callback(success)
+            }
+            initializationCallbacks.removeAll()
         }
     }
     
