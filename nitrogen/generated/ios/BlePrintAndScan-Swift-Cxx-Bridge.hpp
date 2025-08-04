@@ -22,8 +22,8 @@ namespace margelo::nitro::bleprintandscan { enum class BeepVolume; }
 namespace margelo::nitro::bleprintandscan { struct DataFormatSettings; }
 // Forward declaration of `Device` to properly resolve imports.
 namespace margelo::nitro::bleprintandscan { struct Device; }
-// Forward declaration of `HybridBlePrintAndScanSpec` to properly resolve imports.
-namespace margelo::nitro::bleprintandscan { class HybridBlePrintAndScanSpec; }
+// Forward declaration of `HybridBlePrinterSpec` to properly resolve imports.
+namespace margelo::nitro::bleprintandscan { class HybridBlePrinterSpec; }
 // Forward declaration of `HybridBleScannerSpec` to properly resolve imports.
 namespace margelo::nitro::bleprintandscan { class HybridBleScannerSpec; }
 // Forward declaration of `PowerSettings` to properly resolve imports.
@@ -38,8 +38,8 @@ namespace margelo::nitro::bleprintandscan { struct ScannerInfo; }
 namespace margelo::nitro::bleprintandscan { enum class ScannerMode; }
 
 // Forward declarations of Swift defined types
-// Forward declaration of `HybridBlePrintAndScanSpec_cxx` to properly resolve imports.
-namespace BlePrintAndScan { class HybridBlePrintAndScanSpec_cxx; }
+// Forward declaration of `HybridBlePrinterSpec_cxx` to properly resolve imports.
+namespace BlePrintAndScan { class HybridBlePrinterSpec_cxx; }
 // Forward declaration of `HybridBleScannerSpec_cxx` to properly resolve imports.
 namespace BlePrintAndScan { class HybridBleScannerSpec_cxx; }
 
@@ -49,7 +49,7 @@ namespace BlePrintAndScan { class HybridBleScannerSpec_cxx; }
 #include "BeepVolume.hpp"
 #include "DataFormatSettings.hpp"
 #include "Device.hpp"
-#include "HybridBlePrintAndScanSpec.hpp"
+#include "HybridBlePrinterSpec.hpp"
 #include "HybridBleScannerSpec.hpp"
 #include "PowerSettings.hpp"
 #include "ScanResult.hpp"
@@ -299,26 +299,17 @@ namespace margelo::nitro::bleprintandscan::bridge::swift {
     return Func_void_std__vector_std__string__Wrapper(std::move(value));
   }
   
-  // pragma MARK: std::shared_ptr<margelo::nitro::bleprintandscan::HybridBlePrintAndScanSpec>
+  // pragma MARK: std::shared_ptr<margelo::nitro::bleprintandscan::HybridBlePrinterSpec>
   /**
-   * Specialized version of `std::shared_ptr<margelo::nitro::bleprintandscan::HybridBlePrintAndScanSpec>`.
+   * Specialized version of `std::shared_ptr<margelo::nitro::bleprintandscan::HybridBlePrinterSpec>`.
    */
-  using std__shared_ptr_margelo__nitro__bleprintandscan__HybridBlePrintAndScanSpec_ = std::shared_ptr<margelo::nitro::bleprintandscan::HybridBlePrintAndScanSpec>;
-  std::shared_ptr<margelo::nitro::bleprintandscan::HybridBlePrintAndScanSpec> create_std__shared_ptr_margelo__nitro__bleprintandscan__HybridBlePrintAndScanSpec_(void* _Nonnull swiftUnsafePointer);
-  void* _Nonnull get_std__shared_ptr_margelo__nitro__bleprintandscan__HybridBlePrintAndScanSpec_(std__shared_ptr_margelo__nitro__bleprintandscan__HybridBlePrintAndScanSpec_ cppType);
+  using std__shared_ptr_margelo__nitro__bleprintandscan__HybridBlePrinterSpec_ = std::shared_ptr<margelo::nitro::bleprintandscan::HybridBlePrinterSpec>;
+  std::shared_ptr<margelo::nitro::bleprintandscan::HybridBlePrinterSpec> create_std__shared_ptr_margelo__nitro__bleprintandscan__HybridBlePrinterSpec_(void* _Nonnull swiftUnsafePointer);
+  void* _Nonnull get_std__shared_ptr_margelo__nitro__bleprintandscan__HybridBlePrinterSpec_(std__shared_ptr_margelo__nitro__bleprintandscan__HybridBlePrinterSpec_ cppType);
   
-  // pragma MARK: std::weak_ptr<margelo::nitro::bleprintandscan::HybridBlePrintAndScanSpec>
-  using std__weak_ptr_margelo__nitro__bleprintandscan__HybridBlePrintAndScanSpec_ = std::weak_ptr<margelo::nitro::bleprintandscan::HybridBlePrintAndScanSpec>;
-  inline std__weak_ptr_margelo__nitro__bleprintandscan__HybridBlePrintAndScanSpec_ weakify_std__shared_ptr_margelo__nitro__bleprintandscan__HybridBlePrintAndScanSpec_(const std::shared_ptr<margelo::nitro::bleprintandscan::HybridBlePrintAndScanSpec>& strong) { return strong; }
-  
-  // pragma MARK: Result<double>
-  using Result_double_ = Result<double>;
-  inline Result_double_ create_Result_double_(double value) {
-    return Result<double>::withValue(std::move(value));
-  }
-  inline Result_double_ create_Result_double_(const std::exception_ptr& error) {
-    return Result<double>::withError(error);
-  }
+  // pragma MARK: std::weak_ptr<margelo::nitro::bleprintandscan::HybridBlePrinterSpec>
+  using std__weak_ptr_margelo__nitro__bleprintandscan__HybridBlePrinterSpec_ = std::weak_ptr<margelo::nitro::bleprintandscan::HybridBlePrinterSpec>;
+  inline std__weak_ptr_margelo__nitro__bleprintandscan__HybridBlePrinterSpec_ weakify_std__shared_ptr_margelo__nitro__bleprintandscan__HybridBlePrinterSpec_(const std::shared_ptr<margelo::nitro::bleprintandscan::HybridBlePrinterSpec>& strong) { return strong; }
   
   // pragma MARK: Result<std::shared_ptr<Promise<void>>>
   using Result_std__shared_ptr_Promise_void___ = Result<std::shared_ptr<Promise<void>>>;

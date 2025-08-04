@@ -245,6 +245,28 @@ class ScannerBluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralD
         }
     }
     
+    func sendCommandWithoutResponse(deviceId: String, command: String) async throws {
+        return try await withCheckedThrowingContinuation { continuation in
+            guard let connectionInfo = scannerConnections[deviceId], connectionInfo.isConnected else {
+                continuation.resume(throwing: NSError(domain: "ScannerBluetoothError", code: 2, userInfo: [NSLocalizedDescriptionKey: "Scanner \(deviceId) is not connected"]))
+                return
+            }
+            
+            guard let writeCharacteristic = connectionInfo.writeCharacteristic else {
+                continuation.resume(throwing: NSError(domain: "ScannerBluetoothError", code: 3, userInfo: [NSLocalizedDescriptionKey: "No write characteristic found for scanner \(deviceId)"]))
+                return
+            }
+            
+            let data = command.data(using: .utf8) ?? Data()
+            connectionInfo.peripheral.writeValue(data, for: writeCharacteristic, type: .withResponse)
+            
+            // Don't wait for response, complete immediately after write
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                continuation.resume()
+            }
+        }
+    }
+    
     // MARK: - CBCentralManagerDelegate
     
     func centralManagerDidUpdateState(_ central: CBCentralManager) {

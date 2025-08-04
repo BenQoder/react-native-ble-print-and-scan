@@ -10,7 +10,7 @@
 #import "BlePrintAndScan-Swift-Cxx-Umbrella.hpp"
 #import <type_traits>
 
-#include "HybridBlePrintAndScanSpecSwift.hpp"
+#include "HybridBlePrinterSpecSwift.hpp"
 #include "HybridBleScannerSpecSwift.hpp"
 
 @interface BlePrintAndScanAutolinking : NSObject
@@ -23,9 +23,9 @@
   using namespace margelo::nitro::bleprintandscan;
 
   HybridObjectRegistry::registerHybridObjectConstructor(
-    "BlePrintAndScan",
+    "BlePrinter",
     []() -> std::shared_ptr<HybridObject> {
-      std::shared_ptr<margelo::nitro::bleprintandscan::HybridBlePrintAndScanSpec> hybridObject = BlePrintAndScan::BlePrintAndScanAutolinking::createBlePrintAndScan();
+      std::shared_ptr<margelo::nitro::bleprintandscan::HybridBlePrinterSpec> hybridObject = BlePrintAndScan::BlePrintAndScanAutolinking::createBlePrinter();
       return hybridObject;
     }
   );

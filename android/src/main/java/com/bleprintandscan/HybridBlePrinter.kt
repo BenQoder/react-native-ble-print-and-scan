@@ -15,7 +15,7 @@ import android.hardware.usb.UsbInterface
 import android.hardware.usb.UsbManager
 import android.util.Base64
 import android.util.Log
-import com.margelo.nitro.bleprintandscan.HybridBlePrintAndScanSpec
+import com.margelo.nitro.bleprintandscan.HybridBlePrinterSpec
 import com.margelo.nitro.core.Promise
 import com.margelo.nitro.core.ArrayBuffer
 import com.margelo.nitro.bleprintandscan.Device
@@ -26,7 +26,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class HybridBlePrintAndScan: HybridBlePrintAndScanSpec() {
+class HybridBlePrinter: HybridBlePrinterSpec() {
     
     private lateinit var bluetoothManager: BluetoothManager
     private var printerInterface: UsbInterface? = null
@@ -37,11 +37,8 @@ class HybridBlePrintAndScan: HybridBlePrintAndScanSpec() {
         private const val USB_PERMISSION_ACTION = "com.bleprintandscan.USB_PERMISSION"
     }
     
-    override fun sum(num1: Double, num2: Double): Double {
-        return num1 + num2
-    }
     
-    override fun initializeBluetooth(): Promise<Unit> {
+    override fun initializePrinter(): Promise<Unit> {
         return Promise.async {
             val appContext = NitroModules.applicationContext!!
             bluetoothManager = BluetoothManager(appContext)
@@ -60,7 +57,7 @@ class HybridBlePrintAndScan: HybridBlePrintAndScanSpec() {
         }
     }
     
-    override fun startScanningForBluetoothDevices(onDeviceFound: (Array<Device>) -> Unit): Promise<Unit> {
+    override fun startScanningForPrinters(onDeviceFound: (Array<Device>) -> Unit): Promise<Unit> {
         return Promise.async {
             if (!bluetoothManager.isBluetoothEnabled()) {
                 throw Exception("Please enable bluetooth")
@@ -83,14 +80,14 @@ class HybridBlePrintAndScan: HybridBlePrintAndScanSpec() {
         }
     }
     
-    override fun suspendScanForBluetoothDevices(): Promise<Unit> {
+    override fun suspendScanForPrinters(): Promise<Unit> {
         return Promise.async {
             val promise = Promise<Unit>()
             bluetoothManager.suspendScanning(promise)
         }
     }
     
-    override fun connectToBluetoothDevice(deviceId: String): Promise<Unit> {
+    override fun connectToPrinter(deviceId: String): Promise<Unit> {
         return Promise.async {
             if (!bluetoothManager.isBluetoothEnabled()) {
                 throw Exception("Please enable bluetooth")
@@ -100,19 +97,19 @@ class HybridBlePrintAndScan: HybridBlePrintAndScanSpec() {
         }
     }
     
-    override fun disconnectFromBluetoothDevice(deviceId: String): Promise<Unit> {
+    override fun disconnectFromPrinter(deviceId: String): Promise<Unit> {
         return Promise.async {
             bluetoothManager.disconnect(deviceId)
         }
     }
     
-    override fun isDeviceConnected(deviceId: String): Promise<Boolean> {
+    override fun isPrinterConnected(deviceId: String): Promise<Boolean> {
         return Promise.async {
             bluetoothManager.isConnected(deviceId)
         }
     }
     
-    override fun getConnectedDevices(): Promise<Array<Device>> {
+    override fun getConnectedPrinters(): Promise<Array<Device>> {
         return Promise.async {
             val connectedDevices = bluetoothManager.getConnectedDevices()
             connectedDevices.map { device ->
@@ -121,7 +118,7 @@ class HybridBlePrintAndScan: HybridBlePrintAndScanSpec() {
         }
     }
     
-    override fun disconnectAllDevices(): Promise<Unit> {
+    override fun disconnectAllPrinters(): Promise<Unit> {
         return Promise.async {
             bluetoothManager.disconnectAllDevices()
         }
@@ -415,6 +412,35 @@ class HybridBlePrintAndScan: HybridBlePrintAndScanSpec() {
             } catch (e: InterruptedException) {
                 Log.e("ThermalPrint", "Thread was interrupted", e)
             }
+        }
+    }
+    
+    // MARK: - Paper Control Functions
+    
+    override fun feedPaper(deviceId: String, lines: Double): Promise<Unit> {
+        return Promise.async {
+            if (!bluetoothManager.isConnected(deviceId)) {
+                throw Exception("Device $deviceId is not connected")
+            }
+            
+            // ESC/POS command for line feed: ESC d + number of lines
+            val clampedLines = lines.toInt().coerceIn(1, 255) // Ensure lines is between 1 and 255
+            val feedCommand = byteArrayOf(0x1B.toByte(), 0x64.toByte(), clampedLines.toByte())
+            
+            bluetoothManager.sendRawData(deviceId, feedCommand)
+        }
+    }
+    
+    override fun cutPaper(deviceId: String): Promise<Unit> {
+        return Promise.async {
+            if (!bluetoothManager.isConnected(deviceId)) {
+                throw Exception("Device $deviceId is not connected")
+            }
+            
+            // ESC/POS command for full cut: GS V + 65 + 0 (full cut)
+            val cutCommand = byteArrayOf(0x1D.toByte(), 0x56.toByte(), 0x41.toByte(), 0x00.toByte())
+            
+            bluetoothManager.sendRawData(deviceId, cutCommand)
         }
     }
 }

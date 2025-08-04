@@ -20,8 +20,8 @@ namespace margelo::nitro::bleprintandscan { enum class BeepVolume; }
 namespace margelo::nitro::bleprintandscan { struct DataFormatSettings; }
 // Forward declaration of `Device` to properly resolve imports.
 namespace margelo::nitro::bleprintandscan { struct Device; }
-// Forward declaration of `HybridBlePrintAndScanSpec` to properly resolve imports.
-namespace margelo::nitro::bleprintandscan { class HybridBlePrintAndScanSpec; }
+// Forward declaration of `HybridBlePrinterSpec` to properly resolve imports.
+namespace margelo::nitro::bleprintandscan { class HybridBlePrinterSpec; }
 // Forward declaration of `HybridBleScannerSpec` to properly resolve imports.
 namespace margelo::nitro::bleprintandscan { class HybridBleScannerSpec; }
 // Forward declaration of `PowerSettings` to properly resolve imports.
@@ -45,7 +45,7 @@ namespace margelo::nitro::bleprintandscan { enum class TimestampFormat; }
 #include "BeepVolume.hpp"
 #include "DataFormatSettings.hpp"
 #include "Device.hpp"
-#include "HybridBlePrintAndScanSpec.hpp"
+#include "HybridBlePrinterSpec.hpp"
 #include "HybridBleScannerSpec.hpp"
 #include "PowerSettings.hpp"
 #include "ScanResult.hpp"
@@ -74,8 +74,8 @@ namespace margelo::nitro::bleprintandscan { enum class TimestampFormat; }
 #include <NitroModules/DateToChronoDate.hpp>
 
 // Forward declarations of Swift defined types
-// Forward declaration of `HybridBlePrintAndScanSpec_cxx` to properly resolve imports.
-namespace BlePrintAndScan { class HybridBlePrintAndScanSpec_cxx; }
+// Forward declaration of `HybridBlePrinterSpec_cxx` to properly resolve imports.
+namespace BlePrintAndScan { class HybridBlePrinterSpec_cxx; }
 // Forward declaration of `HybridBleScannerSpec_cxx` to properly resolve imports.
 namespace BlePrintAndScan { class HybridBleScannerSpec_cxx; }
 

@@ -22,15 +22,12 @@ extension Array {
     }
 }
 
-class HybridBlePrintAndScan: HybridBlePrintAndScanSpec {
+class HybridBlePrinter: HybridBlePrinterSpec {
     
     private var bluetoothManager: BluetoothManager? = nil
     
-    func sum(num1: Double, num2: Double) throws -> Double {
-        return num1 + num2
-    }
     
-    func initializeBluetooth() throws -> Promise<Void> {
+    func initializePrinter() throws -> Promise<Void> {
         return Promise.async {
             if self.bluetoothManager == nil {
                 self.bluetoothManager = BluetoothManager()
@@ -44,7 +41,7 @@ class HybridBlePrintAndScan: HybridBlePrintAndScanSpec {
         }
     }
     
-    func startScanningForBluetoothDevices(onDeviceFound: @escaping ([Device]) -> Void) throws -> Promise<Void> {
+    func startScanningForPrinters(onDeviceFound: @escaping ([Device]) -> Void) throws -> Promise<Void> {
         return Promise.async {
             guard let manager = self.bluetoothManager else {
                 throw NSError(domain: "BluetoothError", code: 2, userInfo: [NSLocalizedDescriptionKey: "BluetoothManager not initialized"])
@@ -62,7 +59,7 @@ class HybridBlePrintAndScan: HybridBlePrintAndScanSpec {
         }
     }
     
-    func suspendScanForBluetoothDevices() throws -> Promise<Void> {
+    func suspendScanForPrinters() throws -> Promise<Void> {
         return Promise.async {
             guard let manager = self.bluetoothManager else {
                 throw NSError(domain: "BluetoothError", code: 2, userInfo: [NSLocalizedDescriptionKey: "BluetoothManager not initialized"])
@@ -72,7 +69,7 @@ class HybridBlePrintAndScan: HybridBlePrintAndScanSpec {
         }
     }
     
-    func connectToBluetoothDevice(deviceId: String) throws -> Promise<Void> {
+    func connectToPrinter(deviceId: String) throws -> Promise<Void> {
         return Promise.async {
             guard let manager = self.bluetoothManager else {
                 throw NSError(domain: "BluetoothError", code: 2, userInfo: [NSLocalizedDescriptionKey: "BluetoothManager not initialized"])
@@ -90,7 +87,7 @@ class HybridBlePrintAndScan: HybridBlePrintAndScanSpec {
         }
     }
     
-    func disconnectFromBluetoothDevice(deviceId: String) throws -> Promise<Void> {
+    func disconnectFromPrinter(deviceId: String) throws -> Promise<Void> {
         return Promise.async {
             guard let manager = self.bluetoothManager else {
                 throw NSError(domain: "BluetoothError", code: 2, userInfo: [NSLocalizedDescriptionKey: "BluetoothManager not initialized"])
@@ -100,7 +97,7 @@ class HybridBlePrintAndScan: HybridBlePrintAndScanSpec {
         }
     }
     
-    func isDeviceConnected(deviceId: String) throws -> Promise<Bool> {
+    func isPrinterConnected(deviceId: String) throws -> Promise<Bool> {
         return Promise.async {
             guard let manager = self.bluetoothManager else {
                 throw NSError(domain: "BluetoothError", code: 2, userInfo: [NSLocalizedDescriptionKey: "BluetoothManager not initialized"])
@@ -110,7 +107,7 @@ class HybridBlePrintAndScan: HybridBlePrintAndScanSpec {
         }
     }
     
-    func getConnectedDevices() throws -> Promise<[Device]> {
+    func getConnectedPrinters() throws -> Promise<[Device]> {
         return Promise.async {
             guard let manager = self.bluetoothManager else {
                 throw NSError(domain: "BluetoothError", code: 2, userInfo: [NSLocalizedDescriptionKey: "BluetoothManager not initialized"])
@@ -120,7 +117,7 @@ class HybridBlePrintAndScan: HybridBlePrintAndScanSpec {
         }
     }
     
-    func disconnectAllDevices() throws -> Promise<Void> {
+    func disconnectAllPrinters() throws -> Promise<Void> {
         return Promise.async {
             guard let manager = self.bluetoothManager else {
                 throw NSError(domain: "BluetoothError", code: 2, userInfo: [NSLocalizedDescriptionKey: "BluetoothManager not initialized"])
@@ -308,5 +305,42 @@ class HybridBlePrintAndScan: HybridBlePrintAndScanSpec {
         }
 
         return chunkedData
+    }
+    
+    // MARK: - Paper Control Functions
+    
+    func feedPaper(deviceId: String, lines: Double) throws -> Promise<Void> {
+        return Promise.async {
+            guard let manager = self.bluetoothManager else {
+                throw NSError(domain: "BluetoothError", code: 2, userInfo: [NSLocalizedDescriptionKey: "BluetoothManager not initialized"])
+            }
+            
+            guard manager.isConnected(deviceId: deviceId) else {
+                throw NSError(domain: "BluetoothError", code: 6, userInfo: [NSLocalizedDescriptionKey: "Device not connected"])
+            }
+            
+            // ESC/POS command for line feed: ESC d + number of lines
+            let clampedLines = max(1, min(255, Int(lines))) // Ensure lines is between 1 and 255
+            let feedCommand = Data([0x1B, 0x64, UInt8(clampedLines)])
+            
+            _ = try await manager.sendRawData(deviceId: deviceId, data: feedCommand)
+        }
+    }
+    
+    func cutPaper(deviceId: String) throws -> Promise<Void> {
+        return Promise.async {
+            guard let manager = self.bluetoothManager else {
+                throw NSError(domain: "BluetoothError", code: 2, userInfo: [NSLocalizedDescriptionKey: "BluetoothManager not initialized"])
+            }
+            
+            guard manager.isConnected(deviceId: deviceId) else {
+                throw NSError(domain: "BluetoothError", code: 6, userInfo: [NSLocalizedDescriptionKey: "Device not connected"])
+            }
+            
+            // ESC/POS command for full cut: GS V + 65 + 0 (full cut)
+            let cutCommand = Data([0x1D, 0x56, 0x41, 0x00])
+            
+            _ = try await manager.sendRawData(deviceId: deviceId, data: cutCommand)
+        }
     }
 }

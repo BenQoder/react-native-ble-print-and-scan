@@ -83,24 +83,24 @@ export default function TabTwoScreen() {
         </ThemedText>
         <ThemedText style={styles.codeBlock}>
           {`// Connect to multiple devices
-await BlePrintAndScan.connectToBluetoothDevice("printer1-id")
-await BlePrintAndScan.connectToBluetoothDevice("printer2-id")
+await BlePrinter.connectToPrinter("printer1-id")
+await BlePrinter.connectToPrinter("printer2-id")
 
 // Print to specific devices
-await BlePrintAndScan.sendToBluetoothThermalPrinter(
+await BlePrinter.sendToBluetoothThermalPrinter(
   "printer1-id", receiptData, 384
 )
-await BlePrintAndScan.sendToBluetoothThermalPrinter(
+await BlePrinter.sendToBluetoothThermalPrinter(
   "printer2-id", labelData, 576
 )
 
 // Check connection status
-const isConnected = await BlePrintAndScan.isDeviceConnected("printer1-id")
-const connectedDevices = await BlePrintAndScan.getConnectedDevices()
+const isConnected = await BlePrinter.isPrinterConnected("printer1-id")
+const connectedDevices = await BlePrinter.getConnectedPrinters()
 
 // Disconnect specific or all devices
-await BlePrintAndScan.disconnectFromBluetoothDevice("printer1-id")
-await BlePrintAndScan.disconnectAllDevices()`}
+await BlePrinter.disconnectFromPrinter("printer1-id")
+await BlePrinter.disconnectAllPrinters()`}
         </ThemedText>
         <ThemedText>
           Key features:

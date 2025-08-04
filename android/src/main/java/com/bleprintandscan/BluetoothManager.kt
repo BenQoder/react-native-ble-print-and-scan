@@ -318,6 +318,10 @@ class BluetoothManager(private val context: Context) {
         }
     }
 
+    suspend fun sendRawData(deviceId: String, data: ByteArray): Boolean {
+        return printWithDevice(deviceId, listOf(data))
+    }
+
     suspend fun printWithDevice(deviceId: String, lines: List<ByteArray>): Boolean = suspendCoroutine { continuation ->
         val connectionInfo = connections[deviceId]
         if (connectionInfo == null || !connectionInfo.isConnected || connectionInfo.connection == null) {

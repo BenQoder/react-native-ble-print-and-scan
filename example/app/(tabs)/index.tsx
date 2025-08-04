@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, TouchableOpacity, ScrollView, Alert, View, Text } from 'react-native';
-import { BlePrintAndScan, type Device } from "react-native-ble-print-and-scan";
+import { BlePrinter, type Device } from "react-native-ble-print-and-scan";
 import { router } from 'expo-router';
 
 export default function HomeScreen() {
@@ -10,12 +10,12 @@ export default function HomeScreen() {
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    initializeBluetooth();
+    initializePrinter();
   }, []);
 
-  const initializeBluetooth = async () => {
+  const initializePrinter = async () => {
     try {
-      await BlePrintAndScan.initializeBluetooth();
+      await BlePrinter.initializePrinter();
       setIsInitialized(true);
       Alert.alert('Success', 'Bluetooth initialized successfully');
     } catch (error) {
@@ -33,7 +33,7 @@ export default function HomeScreen() {
       setIsScanning(true);
       setDevices([]);
 
-      await BlePrintAndScan.startScanningForBluetoothDevices((foundDevices: Device[]) => {
+      await BlePrinter.startScanningForPrinters((foundDevices: Device[]) => {
         setDevices(foundDevices);
       });
 
@@ -45,7 +45,7 @@ export default function HomeScreen() {
 
   const stopScanning = async () => {
     try {
-      await BlePrintAndScan.suspendScanForBluetoothDevices();
+      await BlePrinter.suspendScanForPrinters();
       setIsScanning(false);
     } catch (error) {
       Alert.alert('Error', `Failed to stop scanning: ${error}`);
@@ -54,10 +54,10 @@ export default function HomeScreen() {
 
   const connectToDevice = async (device: Device) => {
     try {
-      await BlePrintAndScan.connectToBluetoothDevice(device.id);
+      await BlePrinter.connectToPrinter(device.id);
       
       // Update connected devices list
-      const updatedConnectedDevices = await BlePrintAndScan.getConnectedDevices();
+      const updatedConnectedDevices = await BlePrinter.getConnectedPrinters();
       setConnectedDevices(updatedConnectedDevices);
       
       Alert.alert('Success', `Connected to ${device.name}`);
@@ -68,10 +68,10 @@ export default function HomeScreen() {
 
   const disconnectDevice = async (device: Device) => {
     try {
-      await BlePrintAndScan.disconnectFromBluetoothDevice(device.id);
+      await BlePrinter.disconnectFromBluetoothDevice(device.id);
       
       // Update connected devices list
-      const updatedConnectedDevices = await BlePrintAndScan.getConnectedDevices();
+      const updatedConnectedDevices = await BlePrinter.getConnectedPrinters();
       setConnectedDevices(updatedConnectedDevices);
       
       
@@ -83,7 +83,7 @@ export default function HomeScreen() {
 
   const disconnectAllDevices = async () => {
     try {
-      await BlePrintAndScan.disconnectAllDevices();
+      await BlePrinter.disconnectAllDevices();
       setConnectedDevices([]);
       Alert.alert('Success', 'Disconnected from all devices');
     } catch (error) {
@@ -100,7 +100,6 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.subtitle}>Sum Test: {BlePrintAndScan.sum(1, 2)}</Text>
 
       <View style={styles.statusContainer}>
         <Text style={styles.statusText}>

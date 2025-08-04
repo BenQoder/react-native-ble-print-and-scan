@@ -9,7 +9,7 @@
 
 // Include C++ implementation defined types
 #include "BlePrintAndScan-Swift-Cxx-Umbrella.hpp"
-#include "HybridBlePrintAndScanSpecSwift.hpp"
+#include "HybridBlePrinterSpecSwift.hpp"
 #include "HybridBleScannerSpecSwift.hpp"
 
 namespace margelo::nitro::bleprintandscan::bridge::swift {
@@ -62,19 +62,19 @@ namespace margelo::nitro::bleprintandscan::bridge::swift {
     };
   }
   
-  // pragma MARK: std::shared_ptr<margelo::nitro::bleprintandscan::HybridBlePrintAndScanSpec>
-  std::shared_ptr<margelo::nitro::bleprintandscan::HybridBlePrintAndScanSpec> create_std__shared_ptr_margelo__nitro__bleprintandscan__HybridBlePrintAndScanSpec_(void* _Nonnull swiftUnsafePointer) {
-    BlePrintAndScan::HybridBlePrintAndScanSpec_cxx swiftPart = BlePrintAndScan::HybridBlePrintAndScanSpec_cxx::fromUnsafe(swiftUnsafePointer);
-    return std::make_shared<margelo::nitro::bleprintandscan::HybridBlePrintAndScanSpecSwift>(swiftPart);
+  // pragma MARK: std::shared_ptr<margelo::nitro::bleprintandscan::HybridBlePrinterSpec>
+  std::shared_ptr<margelo::nitro::bleprintandscan::HybridBlePrinterSpec> create_std__shared_ptr_margelo__nitro__bleprintandscan__HybridBlePrinterSpec_(void* _Nonnull swiftUnsafePointer) {
+    BlePrintAndScan::HybridBlePrinterSpec_cxx swiftPart = BlePrintAndScan::HybridBlePrinterSpec_cxx::fromUnsafe(swiftUnsafePointer);
+    return std::make_shared<margelo::nitro::bleprintandscan::HybridBlePrinterSpecSwift>(swiftPart);
   }
-  void* _Nonnull get_std__shared_ptr_margelo__nitro__bleprintandscan__HybridBlePrintAndScanSpec_(std__shared_ptr_margelo__nitro__bleprintandscan__HybridBlePrintAndScanSpec_ cppType) {
-    std::shared_ptr<margelo::nitro::bleprintandscan::HybridBlePrintAndScanSpecSwift> swiftWrapper = std::dynamic_pointer_cast<margelo::nitro::bleprintandscan::HybridBlePrintAndScanSpecSwift>(cppType);
+  void* _Nonnull get_std__shared_ptr_margelo__nitro__bleprintandscan__HybridBlePrinterSpec_(std__shared_ptr_margelo__nitro__bleprintandscan__HybridBlePrinterSpec_ cppType) {
+    std::shared_ptr<margelo::nitro::bleprintandscan::HybridBlePrinterSpecSwift> swiftWrapper = std::dynamic_pointer_cast<margelo::nitro::bleprintandscan::HybridBlePrinterSpecSwift>(cppType);
     #ifdef NITRO_DEBUG
     if (swiftWrapper == nullptr) [[unlikely]] {
-      throw std::runtime_error("Class \"HybridBlePrintAndScanSpec\" is not implemented in Swift!");
+      throw std::runtime_error("Class \"HybridBlePrinterSpec\" is not implemented in Swift!");
     }
     #endif
-    BlePrintAndScan::HybridBlePrintAndScanSpec_cxx& swiftPart = swiftWrapper->getSwiftPart();
+    BlePrintAndScan::HybridBlePrinterSpec_cxx& swiftPart = swiftWrapper->getSwiftPart();
     return swiftPart.toUnsafe();
   }
   

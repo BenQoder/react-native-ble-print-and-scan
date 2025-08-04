@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, TouchableOpacity, View, Text, Alert } from 'react-native';
-import { BlePrintAndScan } from "react-native-ble-print-and-scan";
+import { BlePrinter } from "react-native-ble-print-and-scan";
 import { useLocalSearchParams, router } from 'expo-router';
 import RecieptDOM from '@/components/RecieptDOM';
 
@@ -31,7 +31,7 @@ export default function PrinterScreen() {
       const base64Data = cachedScreenshot.split(',')[1];
       console.log("Base64 data only, length:", base64Data.length);
 
-      await BlePrintAndScan.sendToBluetoothThermalPrinter(deviceId, base64Data, 384); // Standard thermal printer width
+      await BlePrinter.sendToBluetoothThermalPrinter(deviceId, base64Data, 384); // Standard thermal printer width
       Alert.alert('Success', `Receipt printed successfully to ${deviceName}`);
     } catch (error) {
       console.error('Error printing receipt:', error);

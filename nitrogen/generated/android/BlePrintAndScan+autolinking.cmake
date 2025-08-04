@@ -27,10 +27,10 @@ target_sources(
   # Autolinking Setup
   ../nitrogen/generated/android/BlePrintAndScanOnLoad.cpp
   # Shared Nitrogen C++ sources
-  ../nitrogen/generated/shared/c++/HybridBlePrintAndScanSpec.cpp
+  ../nitrogen/generated/shared/c++/HybridBlePrinterSpec.cpp
   ../nitrogen/generated/shared/c++/HybridBleScannerSpec.cpp
   # Android-specific Nitrogen C++ sources
-  ../nitrogen/generated/android/c++/JHybridBlePrintAndScanSpec.cpp
+  ../nitrogen/generated/android/c++/JHybridBlePrinterSpec.cpp
   ../nitrogen/generated/android/c++/JHybridBleScannerSpec.cpp
 )
 

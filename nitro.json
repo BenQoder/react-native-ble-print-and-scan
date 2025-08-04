@@ -13,9 +13,9 @@
     "androidCxxLibName": "BlePrintAndScan"
   },
   "autolinking": {
-    "BlePrintAndScan": {
-      "swift": "HybridBlePrintAndScan",
-      "kotlin": "HybridBlePrintAndScan"
+    "BlePrinter": {
+      "swift": "HybridBlePrinter",
+      "kotlin": "HybridBlePrinter"
     },
     "BleScanner": {
       "swift": "HybridBleScanner",

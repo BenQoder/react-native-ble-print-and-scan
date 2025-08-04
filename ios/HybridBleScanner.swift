@@ -198,7 +198,7 @@ class HybridBleScanner: HybridBleScannerSpec {
             }
             
             let command = "%SCANTM#\(duration.rawValue)#"
-            _ = try await manager.sendCommand(deviceId: deviceId, command: command)
+            _ = try await manager.sendCommandWithoutResponse(deviceId: deviceId, command: command)
         }
     }
     

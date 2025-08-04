@@ -166,6 +166,10 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         }
     }
     
+    func sendRawData(deviceId: String, data: Data) async throws -> Bool {
+        return try await printWithDevice(deviceId: deviceId, lines: [data])
+    }
+    
     // Writing state per device
     private var writingStates: [String: WritingState] = [:]
     
