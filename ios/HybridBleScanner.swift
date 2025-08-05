@@ -15,7 +15,7 @@ class HybridBleScanner: HybridBleScannerSpec {
     
     // MARK: - HybridObject Lifecycle
     
-    func dispose() throws {
+    func dispose() {
         // Clean up resources when the object is being disposed
         scannerManager = nil
     }
