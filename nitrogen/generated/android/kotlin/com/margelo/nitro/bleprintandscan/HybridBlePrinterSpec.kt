@@ -42,10 +42,6 @@ abstract class HybridBlePrinterSpec: HybridObject() {
   // Methods
   @DoNotStrip
   @Keep
-  abstract fun dispose(): Unit
-  
-  @DoNotStrip
-  @Keep
   abstract fun initializePrinter(): Promise<Unit>
   
   abstract fun startScanningForPrinters(onDeviceFound: (devices: Array<Device>) -> Unit): Promise<Unit>

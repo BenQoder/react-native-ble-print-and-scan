@@ -6,9 +6,6 @@ export interface Device {
 }
 
 export interface BlePrinter extends HybridObject<{ android: 'kotlin', ios: 'swift' }> {
-  // HybridObject lifecycle - required by Nitro bridge
-  dispose(): void
-  
   // Bluetooth connection management
   initializePrinter(): Promise<void>
   startScanningForPrinters(onDeviceFound: (devices: Device[]) => void): Promise<void>

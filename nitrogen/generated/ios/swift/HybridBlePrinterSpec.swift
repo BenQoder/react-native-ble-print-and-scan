@@ -14,7 +14,6 @@ public protocol HybridBlePrinterSpec_protocol: HybridObject {
   
 
   // Methods
-  func dispose() throws -> Void
   func initializePrinter() throws -> Promise<Void>
   func startScanningForPrinters(onDeviceFound: @escaping (_ devices: [Device]) -> Void) throws -> Promise<Void>
   func suspendScanForPrinters() throws -> Promise<Void>

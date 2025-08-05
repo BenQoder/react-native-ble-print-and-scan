@@ -65,9 +65,6 @@ export enum ScannerTrigger {
 }
 
 export interface BleScanner extends HybridObject<{ android: 'kotlin', ios: 'swift' }> {
-  // HybridObject lifecycle - required by Nitro bridge  
-  dispose(): void
-  
   // Scanner connection management
   initializeScanner(): Promise<void>
   startScanningForScanners(onScannerFound: (devices: Device[]) => void): Promise<void>

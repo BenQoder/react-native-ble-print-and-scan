@@ -50,10 +50,6 @@ namespace margelo::nitro::bleprintandscan {
   
 
   // Methods
-  void JHybridBlePrinterSpec::dispose() {
-    static const auto method = javaClassStatic()->getMethod<void()>("dispose");
-    method(_javaPart);
-  }
   std::shared_ptr<Promise<void>> JHybridBlePrinterSpec::initializePrinter() {
     static const auto method = javaClassStatic()->getMethod<jni::local_ref<JPromise::javaobject>()>("initializePrinter");
     auto __result = method(_javaPart);
