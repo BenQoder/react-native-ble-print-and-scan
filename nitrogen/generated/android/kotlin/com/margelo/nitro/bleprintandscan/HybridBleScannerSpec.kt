@@ -42,6 +42,10 @@ abstract class HybridBleScannerSpec: HybridObject() {
   // Methods
   @DoNotStrip
   @Keep
+  abstract fun dispose(): Unit
+  
+  @DoNotStrip
+  @Keep
   abstract fun initializeScanner(): Promise<Unit>
   
   abstract fun startScanningForScanners(onScannerFound: (devices: Array<Device>) -> Unit): Promise<Unit>

@@ -14,6 +14,7 @@ namespace margelo::nitro::bleprintandscan {
     HybridObject::loadHybridMethods();
     // load custom methods/properties
     registerHybrids(this, [](Prototype& prototype) {
+      prototype.registerHybridMethod("dispose", &HybridBleScannerSpec::dispose);
       prototype.registerHybridMethod("initializeScanner", &HybridBleScannerSpec::initializeScanner);
       prototype.registerHybridMethod("startScanningForScanners", &HybridBleScannerSpec::startScanningForScanners);
       prototype.registerHybridMethod("suspendScanForScanners", &HybridBleScannerSpec::suspendScanForScanners);

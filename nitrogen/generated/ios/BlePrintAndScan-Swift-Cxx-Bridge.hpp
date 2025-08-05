@@ -287,6 +287,15 @@ namespace margelo::nitro::bleprintandscan::bridge::swift {
   using std__weak_ptr_margelo__nitro__bleprintandscan__HybridBlePrinterSpec_ = std::weak_ptr<margelo::nitro::bleprintandscan::HybridBlePrinterSpec>;
   inline std__weak_ptr_margelo__nitro__bleprintandscan__HybridBlePrinterSpec_ weakify_std__shared_ptr_margelo__nitro__bleprintandscan__HybridBlePrinterSpec_(const std::shared_ptr<margelo::nitro::bleprintandscan::HybridBlePrinterSpec>& strong) { return strong; }
   
+  // pragma MARK: Result<void>
+  using Result_void_ = Result<void>;
+  inline Result_void_ create_Result_void_() {
+    return Result<void>::withValue();
+  }
+  inline Result_void_ create_Result_void_(const std::exception_ptr& error) {
+    return Result<void>::withError(error);
+  }
+  
   // pragma MARK: Result<std::shared_ptr<Promise<void>>>
   using Result_std__shared_ptr_Promise_void___ = Result<std::shared_ptr<Promise<void>>>;
   inline Result_std__shared_ptr_Promise_void___ create_Result_std__shared_ptr_Promise_void___(const std::shared_ptr<Promise<void>>& value) {

@@ -68,6 +68,12 @@ namespace margelo::nitro::bleprintandscan {
 
   public:
     // Methods
+    inline void dispose() override {
+      auto __result = _swiftPart.dispose();
+      if (__result.hasError()) [[unlikely]] {
+        std::rethrow_exception(__result.error());
+      }
+    }
     inline std::shared_ptr<Promise<void>> initializePrinter() override {
       auto __result = _swiftPart.initializePrinter();
       if (__result.hasError()) [[unlikely]] {

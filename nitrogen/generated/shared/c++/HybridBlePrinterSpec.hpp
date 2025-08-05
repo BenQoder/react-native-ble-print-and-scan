@@ -56,6 +56,7 @@ namespace margelo::nitro::bleprintandscan {
 
     public:
       // Methods
+      virtual void dispose() = 0;
       virtual std::shared_ptr<Promise<void>> initializePrinter() = 0;
       virtual std::shared_ptr<Promise<void>> startScanningForPrinters(const std::function<void(const std::vector<Device>& /* devices */)>& onDeviceFound) = 0;
       virtual std::shared_ptr<Promise<void>> suspendScanForPrinters() = 0;
