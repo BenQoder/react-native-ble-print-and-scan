@@ -13,6 +13,13 @@ class HybridBleScanner: HybridBleScannerSpec {
     
     private var scannerManager: ScannerBluetoothManager? = nil
     
+    // MARK: - HybridObject Lifecycle
+    
+    func dispose() {
+        // Clean up resources when the object is being disposed
+        scannerManager = nil
+    }
+    
     // MARK: - Scanner Connection Management
     
     func initializeScanner() throws -> Promise<Void> {

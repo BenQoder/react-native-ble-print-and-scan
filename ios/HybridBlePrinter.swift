@@ -26,6 +26,12 @@ class HybridBlePrinter: HybridBlePrinterSpec {
     
     private var bluetoothManager: BluetoothManager? = nil
     
+    // MARK: - HybridObject Lifecycle
+    
+    func dispose() {
+        // Clean up resources when the object is being disposed
+        bluetoothManager = nil
+    }
     
     func initializePrinter() throws -> Promise<Void> {
         return Promise.async {
