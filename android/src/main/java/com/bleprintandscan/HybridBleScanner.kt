@@ -134,6 +134,7 @@ class HybridBleScanner: HybridBleScannerSpec() {
             
             val command = "%SCANTM#${duration.ordinal + 1}#"
             scannerManager.sendCommandWithoutResponse(deviceId, command)
+            Unit
         }
     }
     
@@ -153,6 +154,7 @@ class HybridBleScanner: HybridBleScannerSpec() {
             }
             
             scannerManager.sendCommandWithoutResponse(deviceId, command)
+            Unit
         }
     }
     
@@ -170,6 +172,7 @@ class HybridBleScanner: HybridBleScannerSpec() {
             }
             
             scannerManager.sendCommandWithoutResponse(deviceId, command)
+            Unit
         }
     }
     
@@ -192,6 +195,7 @@ class HybridBleScanner: HybridBleScannerSpec() {
             }
             
             scannerManager.sendCommandWithoutResponse(deviceId, command)
+            Unit
         }
     }
     
@@ -222,6 +226,7 @@ class HybridBleScanner: HybridBleScannerSpec() {
             for (command in commands) {
                 scannerManager.sendCommandWithoutResponse(deviceId, command)
             }
+            Unit
         }
     }
     
@@ -237,6 +242,7 @@ class HybridBleScanner: HybridBleScannerSpec() {
             }
             
             scannerManager.sendCommandWithoutResponse(deviceId, command)
+            Unit
         }
     }
     
@@ -249,6 +255,7 @@ class HybridBleScanner: HybridBleScannerSpec() {
             }
             
             scannerManager.sendCommandWithoutResponse(deviceId, ScannerBluetoothManager.RESTORE_FACTORY_SETTINGS)
+            Unit
         }
     }
     
@@ -262,6 +269,7 @@ class HybridBleScanner: HybridBleScannerSpec() {
             val command = "\$BUZZ#B${(clampedLevel + 0x30).toChar()}"
             
             scannerManager.sendCommandWithoutResponse(deviceId, command)
+            Unit
         }
     }
     
@@ -284,6 +292,7 @@ class HybridBleScanner: HybridBleScannerSpec() {
             val command = "\$BUZZ#BK$s1$s2$s3"
             
             scannerManager.sendCommandWithoutResponse(deviceId, command)
+            Unit
         }
     }
     
@@ -294,6 +303,7 @@ class HybridBleScanner: HybridBleScannerSpec() {
             }
             
             scannerManager.sendCommandWithoutResponse(deviceId, ScannerBluetoothManager.POWER_OFF)
+            Unit
         }
     }
     
@@ -333,6 +343,7 @@ class HybridBleScanner: HybridBleScannerSpec() {
             }
             
             scannerManager.sendCommandWithoutResponse(deviceId, "%#*NEW*")
+            Unit
         }
     }
     

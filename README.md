@@ -418,6 +418,55 @@ enum ScannerTrigger {
 - Test with known working barcodes/QR codes first
 - Check device documentation for specific command requirements
 
+## 📱 Example App & Trigger Mode Demos
+
+The included example app provides comprehensive demonstrations of all scanner trigger modes:
+
+### Available Trigger Mode Examples
+
+1. **Host Trigger Mode** (`/trigger-modes/host-trigger`)
+   - Programmatic scan control via app commands
+   - Multiple trigger durations (1s, 2s, 3s, 5s)
+   - Perfect for automation and app-guided workflows
+   - Real-time scan result display
+
+2. **Key Hold Mode** (`/trigger-modes/key-hold`)
+   - Continuous scanning while physical button is held
+   - Manual control with immediate feedback
+   - Ideal for bulk scanning operations
+
+3. **Key Pulse Mode** (`/trigger-modes/key-pulse`)
+   - Single scan per button press
+   - Prevents duplicate scans
+   - Perfect for precise inventory management
+
+4. **Continuous Mode** (`/trigger-modes/continuous`)
+   - Automatic scanning when barcode is detected
+   - No button interaction required
+   - Ideal for high-volume, hands-free operations
+
+### Running the Examples
+
+```bash
+cd example
+npm install
+npx expo run:ios    # or npx expo run:android
+```
+
+Navigate to the "Trigger Modes" tab to explore each scanning mode with:
+- Step-by-step setup instructions
+- Real-time configuration options
+- Live scan result display
+- Best practice recommendations
+- Use case scenarios
+
+### Example Features
+- **Interactive Configuration**: Toggle beep settings, scan modes, and connection options
+- **Real-time Results**: See scan results immediately with timestamps
+- **Connection Management**: Easy scanner discovery and connection
+- **Mode Switching**: Compare different trigger modes in the same app
+- **Comprehensive Documentation**: In-app explanations and usage tips
+
 ## Support
 
 For issues related to:
