@@ -6,7 +6,9 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "react",
-    "lib": ["esnext"],
+    "lib": [
+      "esnext"
+    ],
     "module": "esnext",
     "moduleResolution": "node",
     "noEmit": false,
@@ -33,5 +35,9 @@
     "**/metro.config.js",
     "**/tsconfig.json"
   ],
-  "include": ["src/**/*", "nitrogen/**/*.json"]
+  "include": [
+    "src/**/*",
+    "nitrogen/**/*.json"
+  ],
+  "extends": "expo/tsconfig.base"
 }

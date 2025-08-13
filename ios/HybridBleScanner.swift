@@ -178,7 +178,7 @@ class HybridBleScanner: HybridBleScannerSpec {
                 command = "%SCMD#03#"
             }
             
-            _ = try await manager.sendCommand(deviceId: deviceId, command: command)
+            _ = try await manager.sendCommandWithoutResponse(deviceId: deviceId, command: command)
         }
     }
     
@@ -200,7 +200,7 @@ class HybridBleScanner: HybridBleScannerSpec {
                 command = "$BUZZ#1"
             }
             
-            _ = try await manager.sendCommand(deviceId: deviceId, command: command)
+            _ = try await manager.sendCommandWithoutResponse(deviceId: deviceId, command: command)
         }
     }
     
@@ -232,7 +232,7 @@ class HybridBleScanner: HybridBleScannerSpec {
                 command = "$RF#ST00" // Default to never sleep
             }
             
-            _ = try await manager.sendCommand(deviceId: deviceId, command: command)
+            _ = try await manager.sendCommandWithoutResponse(deviceId: deviceId, command: command)
         }
     }
     
@@ -261,7 +261,7 @@ class HybridBleScanner: HybridBleScannerSpec {
             }
             
             for command in commands {
-                _ = try await manager.sendCommand(deviceId: deviceId, command: command)
+                _ = try await manager.sendCommandWithoutResponse(deviceId: deviceId, command: command)
             }
         }
     }
@@ -280,7 +280,7 @@ class HybridBleScanner: HybridBleScannerSpec {
                 command = "%RTCSTAMP#1"
             }
             
-            _ = try await manager.sendCommand(deviceId: deviceId, command: command)
+            _ = try await manager.sendCommandWithoutResponse(deviceId: deviceId, command: command)
         }
     }
     
@@ -305,7 +305,7 @@ class HybridBleScanner: HybridBleScannerSpec {
             let clampedLevel = max(0, min(26, Int(level)))
             let command = "$BUZZ#B\(String(format: "%c", clampedLevel + 0x30))"
             
-            _ = try await manager.sendCommand(deviceId: deviceId, command: command)
+            _ = try await manager.sendCommandWithoutResponse(deviceId: deviceId, command: command)
         }
     }
     
@@ -327,7 +327,7 @@ class HybridBleScanner: HybridBleScannerSpec {
             
             let command = "$BUZZ#BK\(s1)\(s2)\(s3)"
             
-            _ = try await manager.sendCommand(deviceId: deviceId, command: command)
+            _ = try await manager.sendCommandWithoutResponse(deviceId: deviceId, command: command)
         }
     }
     
@@ -363,7 +363,7 @@ class HybridBleScanner: HybridBleScannerSpec {
             }
             
             let command = clearAfterUpload ? "%#TXMEM#C" : "%#TXMEM"
-            _ = try await manager.sendCommand(deviceId: deviceId, command: command)
+            _ = try await manager.sendCommandWithoutResponse(deviceId: deviceId, command: command)
             
             // This would need proper implementation to collect multiple scan results
             return []

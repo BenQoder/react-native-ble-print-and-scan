@@ -71,7 +71,9 @@ class ScannerBluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralD
     func requestBluetoothPermissions() -> Bool {
         // Check authorization status first
         if #available(iOS 13.0, *) {
-            guard CBManager.authorization == .allowedAlways else {
+            // For Bluetooth, we check if not denied or restricted
+            let status = CBManager.authorization
+            if status == .denied || status == .restricted {
                 return false
             }
         } else {
@@ -295,12 +297,11 @@ class ScannerBluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralD
             }
             
             let data = command.data(using: .utf8) ?? Data()
-            connectionInfo.peripheral.writeValue(data, for: writeCharacteristic, type: .withResponse)
+            // Use .withoutResponse to avoid waiting for acknowledgment
+            connectionInfo.peripheral.writeValue(data, for: writeCharacteristic, type: .withoutResponse)
             
-            // Don't wait for response, complete immediately after write
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                continuation.resume()
-            }
+            // Complete immediately since we're not waiting for response
+            continuation.resume()
         }
     }
     
