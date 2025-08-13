@@ -23,12 +23,18 @@ class HybridBleScanner: HybridBleScannerSpec() {
                 throw Exception("Bluetooth is not supported on this device")
             }
             
-            val activity = NitroModules.applicationContext!!.currentActivity as? Activity
-                ?: throw Exception("Cannot initialize Scanner Bluetooth without an activity")
+            // Skip permission request for now - permissions should be handled in JS layer
+            // This matches the iOS implementation which doesn't require activity context
             
-            val permissionsGranted = scannerManager.requestBluetoothPermissions(activity)
-            if (!permissionsGranted) {
-                throw Exception("Scanner Bluetooth permissions not granted")
+            // Optional: Try to get activity for permissions, but don't fail if not available
+            try {
+                val activity = NitroModules.applicationContext?.currentActivity as? Activity
+                if (activity != null) {
+                    scannerManager.requestBluetoothPermissions(activity)
+                }
+            } catch (e: Exception) {
+                // Log but don't fail - permissions might already be granted
+                android.util.Log.w("HybridBleScanner", "Could not request permissions: ${e.message}")
             }
         }
     }
@@ -127,7 +133,7 @@ class HybridBleScanner: HybridBleScannerSpec() {
             }
             
             val command = "%SCANTM#${duration.ordinal + 1}#"
-            scannerManager.sendCommand(deviceId, command)
+            scannerManager.sendCommandWithoutResponse(deviceId, command)
         }
     }
     
@@ -146,7 +152,7 @@ class HybridBleScanner: HybridBleScannerSpec() {
                 ScannerMode.HOST_TRIGGER -> "%SCMD#03#"
             }
             
-            scannerManager.sendCommand(deviceId, command)
+            scannerManager.sendCommandWithoutResponse(deviceId, command)
         }
     }
     
@@ -163,7 +169,7 @@ class HybridBleScanner: HybridBleScannerSpec() {
                 BeepVolume.HIGH -> ScannerBluetoothManager.BEEP_HIGH_VOLUME
             }
             
-            scannerManager.sendCommand(deviceId, command)
+            scannerManager.sendCommandWithoutResponse(deviceId, command)
         }
     }
     
@@ -185,7 +191,7 @@ class HybridBleScanner: HybridBleScannerSpec() {
                 else -> ScannerBluetoothManager.NEVER_SLEEP
             }
             
-            scannerManager.sendCommand(deviceId, command)
+            scannerManager.sendCommandWithoutResponse(deviceId, command)
         }
     }
     
@@ -214,7 +220,7 @@ class HybridBleScanner: HybridBleScannerSpec() {
             }
             
             for (command in commands) {
-                scannerManager.sendCommand(deviceId, command)
+                scannerManager.sendCommandWithoutResponse(deviceId, command)
             }
         }
     }
@@ -230,7 +236,7 @@ class HybridBleScanner: HybridBleScannerSpec() {
                 TimestampFormat.DATE_TIME, TimestampFormat.UNIX_TIMESTAMP -> ScannerBluetoothManager.ENABLE_TIMESTAMP
             }
             
-            scannerManager.sendCommand(deviceId, command)
+            scannerManager.sendCommandWithoutResponse(deviceId, command)
         }
     }
     
@@ -242,7 +248,7 @@ class HybridBleScanner: HybridBleScannerSpec() {
                 throw Exception("Scanner $deviceId is not connected")
             }
             
-            scannerManager.sendCommand(deviceId, ScannerBluetoothManager.RESTORE_FACTORY_SETTINGS)
+            scannerManager.sendCommandWithoutResponse(deviceId, ScannerBluetoothManager.RESTORE_FACTORY_SETTINGS)
         }
     }
     
@@ -255,7 +261,7 @@ class HybridBleScanner: HybridBleScannerSpec() {
             val clampedLevel = level.toInt().coerceIn(0, 26)
             val command = "\$BUZZ#B${(clampedLevel + 0x30).toChar()}"
             
-            scannerManager.sendCommand(deviceId, command)
+            scannerManager.sendCommandWithoutResponse(deviceId, command)
         }
     }
     
@@ -277,7 +283,7 @@ class HybridBleScanner: HybridBleScannerSpec() {
             
             val command = "\$BUZZ#BK$s1$s2$s3"
             
-            scannerManager.sendCommand(deviceId, command)
+            scannerManager.sendCommandWithoutResponse(deviceId, command)
         }
     }
     
@@ -287,7 +293,7 @@ class HybridBleScanner: HybridBleScannerSpec() {
                 throw Exception("Scanner $deviceId is not connected")
             }
             
-            scannerManager.sendCommand(deviceId, ScannerBluetoothManager.POWER_OFF)
+            scannerManager.sendCommandWithoutResponse(deviceId, ScannerBluetoothManager.POWER_OFF)
         }
     }
     
@@ -326,7 +332,7 @@ class HybridBleScanner: HybridBleScannerSpec() {
                 throw Exception("Scanner $deviceId is not connected")
             }
             
-            scannerManager.sendCommand(deviceId, "%#*NEW*")
+            scannerManager.sendCommandWithoutResponse(deviceId, "%#*NEW*")
         }
     }
     

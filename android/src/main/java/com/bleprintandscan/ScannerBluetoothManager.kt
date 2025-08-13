@@ -445,6 +445,37 @@ class ScannerBluetoothManager(private val context: Context) {
         }
     }
     
+    suspend fun sendCommandWithoutResponse(deviceId: String, command: String): Boolean = suspendCoroutine { continuation ->
+        val connectionInfo = scannerConnections[deviceId]
+        if (connectionInfo == null || !connectionInfo.isConnected) {
+            continuation.resumeWithException(Exception("Scanner $deviceId is not connected"))
+            return@suspendCoroutine
+        }
+        
+        val outputStream = connectionInfo.outputStream
+        if (outputStream == null) {
+            continuation.resumeWithException(Exception("No output stream for scanner $deviceId"))
+            return@suspendCoroutine
+        }
+        
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                // Package command with protocol wrapper (from natum-android analysis)
+                val commandData = packageCommand(command)
+                
+                outputStream.write(commandData)
+                outputStream.flush()
+                
+                Log.d(TAG, "Sent command to scanner $deviceId (no response expected): $command")
+                continuation.resume(true)
+                
+            } catch (e: Exception) {
+                Log.e(TAG, "Error sending command to scanner $deviceId: ${e.message}")
+                continuation.resumeWithException(e)
+            }
+        }
+    }
+    
     suspend fun sendCommand(deviceId: String, command: String): String = suspendCoroutine { continuation ->
         val connectionInfo = scannerConnections[deviceId]
         if (connectionInfo == null || !connectionInfo.isConnected) {
