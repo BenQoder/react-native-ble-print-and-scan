@@ -40,7 +40,7 @@ int initialize(JavaVM* vm) {
     HybridObjectRegistry::registerHybridObjectConstructor(
       "BlePrinter",
       []() -> std::shared_ptr<HybridObject> {
-        static DefaultConstructableObject<JHybridBlePrinterSpec::javaobject> object("com/margelo/nitro/bleprintandscan/HybridBlePrinter");
+        static DefaultConstructableObject<JHybridBlePrinterSpec::javaobject> object("com/bleprintandscan/HybridBlePrinter");
         auto instance = object.create();
         auto globalRef = jni::make_global(instance);
         return JNISharedPtr::make_shared_from_jni<JHybridBlePrinterSpec>(globalRef);
@@ -49,7 +49,7 @@ int initialize(JavaVM* vm) {
     HybridObjectRegistry::registerHybridObjectConstructor(
       "BleScanner",
       []() -> std::shared_ptr<HybridObject> {
-        static DefaultConstructableObject<JHybridBleScannerSpec::javaobject> object("com/margelo/nitro/bleprintandscan/HybridBleScanner");
+        static DefaultConstructableObject<JHybridBleScannerSpec::javaobject> object("com/bleprintandscan/HybridBleScanner");
         auto instance = object.create();
         auto globalRef = jni::make_global(instance);
         return JNISharedPtr::make_shared_from_jni<JHybridBleScannerSpec>(globalRef);
