@@ -14,12 +14,24 @@
   },
   "autolinking": {
     "BlePrinter": {
-      "swift": "HybridBlePrinter",
-      "kotlin": "HybridBlePrinter"
+      "ios": {
+        "language": "swift",
+        "implementationClassName": "HybridBlePrinter"
+      },
+      "android": {
+        "language": "kotlin",
+        "implementationClassName": "HybridBlePrinter"
+      }
     },
     "BleScanner": {
-      "swift": "HybridBleScanner",
-      "kotlin": "HybridBleScanner"
+      "ios": {
+        "language": "swift",
+        "implementationClassName": "HybridBleScanner"
+      },
+      "android": {
+        "language": "kotlin",
+        "implementationClassName": "HybridBleScanner"
+      }
     }
   },
   "ignorePaths": [

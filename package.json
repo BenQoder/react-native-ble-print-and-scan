@@ -12,8 +12,7 @@
     "clean": "git clean -dfX",
     "release": "semantic-release",
     "build": "npm run typecheck && bob build",
-    "codegen": "nitro-codegen --logLevel=\"debug\" && npm run build && node post-script.js",
-    "postcodegen": "npm --prefix example run pod"
+    "codegen": "nitrogen && npm run build"
   },
   "keywords": [
     "react-native",
@@ -56,19 +55,19 @@
     "@semantic-release/git": "^10.0.1",
     "@types/jest": "^29.5.12",
     "@types/react": "^19.1.0",
-    "nitro-codegen": "^0.27.2",
+    "conventional-changelog-conventionalcommits": "^9.0.0",
+    "nitrogen": "^0.35.4",
     "react": "19.0.0",
     "react-native": "0.79.5",
     "react-native-builder-bob": "^0.37.0",
-    "react-native-nitro-modules": "^0.27.2",
-    "conventional-changelog-conventionalcommits": "^9.0.0",
+    "react-native-nitro-modules": "^0.35.4",
     "semantic-release": "^24.2.6",
-    "typescript": "5.0.4"
+    "typescript": "^5.9.3"
   },
   "peerDependencies": {
     "react": "*",
     "react-native": "*",
-    "react-native-nitro-modules": "*"
+    "react-native-nitro-modules": "^0.35.4"
   },
   "eslintConfig": {
     "root": true,
