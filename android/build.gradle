@@ -138,7 +138,7 @@ dependencies {
   implementation project(":react-native-nitro-modules")
   
   // RxAndroidBle for Bluetooth Low Energy
-  implementation 'com.polidea.rxandroidble3:rxandroidble:1.18.1'
+  implementation 'com.polidea.rxandroidble3:rxandroidble:1.19.1'
   
   // RxJava dependencies
   implementation 'io.reactivex.rxjava3:rxjava:3.1.8'
